@@ -1,6 +1,13 @@
 dependencies {
     // The compatibility stack used by the default EvenMoBends development client.
     // These are deliberately not published as hard dependencies of EvenMoBends.
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.7.171:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.1.53:dev")
+    runtimeOnlyNonPublishable("dev.dediamondpro.resourcify:VintageResourcify:1.0.5:dev")
+    runtimeOnlyNonPublishable("org.fentanylsolutions.vrap:vrap:1.0.1:dev")
+    runtimeOnlyNonPublishable("com.falsepattern:forgelin-mc1.7.10:2.4.1-2.3.10")
+
+    // devOnlyNonPublishable includes both compile and non-published runtime scopes.
     devOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:${gtnhLibVersion}:dev")
     devOnlyNonPublishable("org.fentanylsolutions.fentlib:FentLib:${fentLibVersion}:dev")
     devOnlyNonPublishable("com.github.GTNewHorizons:ModularUI2:${modularUI2Version}:dev")
