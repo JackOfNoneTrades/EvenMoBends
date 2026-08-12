@@ -298,6 +298,8 @@ extends ModelBiped {
                 this.animatePlayer("riding", argEntity, data);
             } else if (argEntity.isInWater()) {
                 this.animatePlayer("swimming", argEntity, data);
+            } else if (player.isOnLadder() && this.animatePlayer("climbing", argEntity, data)) {
+                // Climbing takes precedence over the ordinary airborne animations.
             } else if (!Data_Player.get(argEntity.getEntityId()).isOnGround() | Data_Player.get((int)argEntity.getEntityId()).ticksAfterTouchdown < 2.0f) {
                 if (!this.shouldAnimateFalling(argEntity, data) || !this.animatePlayer("falling", argEntity, data)) {
                     this.animatePlayer("jump", argEntity, data);
