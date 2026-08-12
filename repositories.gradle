@@ -1,0 +1,6 @@
+repositories {
+    maven {
+        name = "Fent Maven"
+        url "https://maven.fentanylsolutions.org/releases"
+    }
+}
