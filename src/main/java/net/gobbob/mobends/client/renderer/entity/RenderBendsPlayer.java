@@ -4,7 +4,9 @@ import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 import net.gobbob.mobends.MoBends;
 import net.gobbob.mobends.client.model.entity.ModelBendsPlayer;
+import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.compat.WawelAuthCompat;
+import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.customarmor.CustomArmor;
 import net.gobbob.mobends.data.Data_Player;
 import net.gobbob.mobends.settings.SettingsBoolean;
@@ -284,9 +286,21 @@ extends RenderPlayer {
             if (argPlayer.isSneaking()) {
                 f5 += 25.0f;
             }
-            GL11.glRotatef((float)(6.0f + f6 / 2.0f + f5), (float)1.0f, (float)0.0f, (float)0.0f);
-            GL11.glRotatef((float)(f7 / 2.0f), (float)0.0f, (float)0.0f, (float)1.0f);
-            GL11.glRotatef((float)(-f7 / 2.0f), (float)0.0f, (float)1.0f, (float)0.0f);
+            boolean creativeFlying = PlayerAnimationConfig.isEnabled("flying")
+                && argPlayer.capabilities.isFlying
+                && !argPlayer.onGround
+                && !EtFuturumRequiemCompat.isElytraFlying(argPlayer);
+            if (creativeFlying) {
+                float flutter = MathHelper.sin((argPlayer.ticksExisted + argPartialTicks) * 0.15f) * 2.0f;
+                float sideSway = MathHelper.clamp_float(f7 * 0.15f, -8.0f, 8.0f);
+                GL11.glRotatef(8.0f + flutter, 1.0f, 0.0f, 0.0f);
+                GL11.glRotatef(sideSway, 0.0f, 0.0f, 1.0f);
+                GL11.glRotatef(-sideSway, 0.0f, 1.0f, 0.0f);
+            } else {
+                GL11.glRotatef((float)(6.0f + f6 / 2.0f + f5), (float)1.0f, (float)0.0f, (float)0.0f);
+                GL11.glRotatef((float)(f7 / 2.0f), (float)0.0f, (float)0.0f, (float)1.0f);
+                GL11.glRotatef((float)(-f7 / 2.0f), (float)0.0f, (float)1.0f, (float)0.0f);
+            }
             GL11.glRotatef((float)180.0f, (float)0.0f, (float)1.0f, (float)0.0f);
             this.modelBipedMain.renderCloak(0.0625f);
             GL11.glPopMatrix();

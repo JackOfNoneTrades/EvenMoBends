@@ -10,6 +10,7 @@ import net.gobbob.mobends.client.model.ModelRendererBends_SeperatedChild;
 import net.gobbob.mobends.client.renderer.SwordTrail;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
+import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.data.Data_Player;
 import net.gobbob.mobends.pack.BendsPack;
@@ -288,7 +289,12 @@ extends ModelBiped {
             ((ModelRendererBends)this.bipedRightForeLeg).resetScale();
             ((ModelRendererBends)this.bipedLeftForeLeg).resetScale();
             BendsVar.tempData = Data_Player.get(argEntity.getEntityId());
-            if (argEntity.isRiding()) {
+            EntityPlayer player = (EntityPlayer)argEntity;
+            boolean elytraFlying = EtFuturumRequiemCompat.isElytraFlying(player);
+            boolean creativeFlying = player.capabilities.isFlying && !data.isOnGround();
+            if ((elytraFlying || creativeFlying) && this.animatePlayer("flying", argEntity, data)) {
+                // Flight takes precedence over the ordinary airborne animations.
+            } else if (argEntity.isRiding()) {
                 this.animatePlayer("riding", argEntity, data);
             } else if (argEntity.isInWater()) {
                 this.animatePlayer("swimming", argEntity, data);

@@ -13,7 +13,7 @@ import net.gobbob.mobends.settings.SettingsBoolean;
 import net.gobbob.mobends.settings.SettingsNode;
 import net.minecraftforge.common.config.Configuration;
 
-@Mod(modid=MoBends.MODID, name=MoBends.MODNAME, version=MoBends.VERSION)
+@Mod(modid=MoBends.MODID, name=MoBends.MODNAME, version=MoBends.VERSION, dependencies="after:etfuturum")
 public class MoBends {
     public static final String MODID = "mobends";
     public static final String MODNAME = "Even Mo' Bends";

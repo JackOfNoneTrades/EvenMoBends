@@ -12,6 +12,7 @@ public final class PlayerAnimationConfig {
     private static boolean sprint = true;
     private static boolean jump = true;
     private static boolean falling = true;
+    private static boolean flying = true;
     private static boolean swimming = true;
     private static boolean bow = true;
     private static boolean riding = true;
@@ -34,6 +35,7 @@ public final class PlayerAnimationConfig {
         sprint = read(config, "sprint", "Sprinting cycle. Falls back to walking when disabled.");
         jump = read(config, "jump", "Ordinary airborne and landing animation.");
         falling = read(config, "falling", "Distinct pose for sustained downward falls.");
+        flying = read(config, "flying", "Creative flight and Et Futurum Requiem Elytra flight pose.");
         swimming = read(config, "swimming", "Surface and idle swimming animation.");
         bow = read(config, "bow", "Bow aiming pose.");
         riding = read(config, "riding", "Mounted player pose.");
@@ -55,6 +57,7 @@ public final class PlayerAnimationConfig {
         write(config, "sprint", sprint);
         write(config, "jump", jump);
         write(config, "falling", falling);
+        write(config, "flying", flying);
         write(config, "swimming", swimming);
         write(config, "bow", bow);
         write(config, "riding", riding);
@@ -76,6 +79,7 @@ public final class PlayerAnimationConfig {
         if ("sprint".equals(animation)) return sprint;
         if ("jump".equals(animation)) return jump;
         if ("falling".equals(animation)) return falling;
+        if ("flying".equals(animation)) return flying;
         if ("swimming".equals(animation)) return swimming;
         if ("bow".equals(animation)) return bow;
         if ("riding".equals(animation)) return riding;
