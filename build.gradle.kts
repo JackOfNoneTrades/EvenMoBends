@@ -2,5 +2,4 @@ plugins {
     id("com.gtnewhorizons.gtnhconvention")
 }
 
-extra["modVersion"] = "0.20.1-even.0"
-version = extra["modVersion"] as String
+apply(from = "https://raw.githubusercontent.com/JackOfNoneTrades/67minecraft-gradle-publish/${property("publish67ScriptTag")}/67minecraft-publish.gradle.kts")

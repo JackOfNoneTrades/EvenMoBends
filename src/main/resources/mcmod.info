@@ -5,7 +5,7 @@
     "description": "A maintained Minecraft 1.7.10 fork of Mo' Bends with explicit compatibility policies.",
     "version": "${modVersion}",
     "mcversion": "${minecraftVersion}",
-    "url": "",
+    "url": "https://github.com/JackOfNoneTrades/EvenMoBends",
     "updateUrl": "",
     "authorList": ["GobBob", "Even Mo' Bends contributors"],
     "credits": "Based on Mo' Bends 0.20.1 by Iwo Plaza / GobBob.",

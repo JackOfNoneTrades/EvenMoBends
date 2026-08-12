@@ -16,7 +16,7 @@ import net.minecraftforge.common.config.Configuration;
 public class MoBends {
     public static final String MODID = "mobends";
     public static final String MODNAME = "Even Mo' Bends";
-    public static final String VERSION = "0.20.1-even.0";
+    public static final String VERSION = Tags.VERSION;
     @SidedProxy(serverSide="net.gobbob.mobends.CommonProxy", clientSide="net.gobbob.mobends.client.ClientProxy")
     public static CommonProxy proxy;
     @Mod.Instance(value="mobends")
