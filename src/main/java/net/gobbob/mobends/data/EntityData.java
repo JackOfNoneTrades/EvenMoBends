@@ -1,11 +1,9 @@
 package net.gobbob.mobends.data;
 
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.AxisAlignedBB;
 import org.lwjgl.util.vector.Vector3f;
 
 public class EntityData {
@@ -41,11 +39,10 @@ public class EntityData {
         if (entity == null) {
             return false;
         }
-        AxisAlignedBB axisalignedbb = entity.boundingBox.copy();
-        double var1 = this.position.y + this.motion.y;
-        int i = 0;
-        List list = entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.addCoord(0.0, -0.001f, 0.0));
-        return i < list.size();
+        return entity.onGround
+            || !entity.worldObj.getCollidingBoundingBoxes(
+                entity,
+                entity.boundingBox.addCoord(0.0, -0.001, 0.0)).isEmpty();
     }
 
     public boolean isOnGround() {
@@ -59,11 +56,11 @@ public class EntityData {
         this.ticksPerFrame = (float)Minecraft.getMinecraft().thePlayer.ticksExisted + argPartialTicks - this.ticks;
         this.ticks = (float)Minecraft.getMinecraft().thePlayer.ticksExisted + argPartialTicks;
         this.updatedThisFrame = false;
-        if (this.calcOnGround() & !this.onGround) {
+        boolean calculatedOnGround = this.calcOnGround();
+        if (calculatedOnGround && !this.onGround) {
             this.onTouchdown();
             this.onGround = true;
-        }
-        if (!this.calcOnGround() & this.onGround | (this.motion_prev.y <= 0.0f && this.motion.y - this.motion_prev.y > 0.4f && this.ticksAfterLiftoff > 2.0f)) {
+        } else if (!calculatedOnGround && this.onGround) {
             this.onLiftoff();
             this.onGround = false;
         }
@@ -103,4 +100,3 @@ public class EntityData {
         this.ticksAfterPunch = 0.0f;
     }
 }
-
