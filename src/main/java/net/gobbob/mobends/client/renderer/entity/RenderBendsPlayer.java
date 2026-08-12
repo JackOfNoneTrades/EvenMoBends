@@ -107,12 +107,19 @@ extends RenderPlayer {
             model.setSlim(WawelAuthCompat.isSlim((AbstractClientPlayer)p_82441_1_));
             ModelRenderer rightArmWear = model.getRightArmWear();
             boolean wearVisible = rightArmWear.showModel;
-            rightArmWear.showModel = !WawelAuthCompat.isRightSleeveHidden(p_82441_1_);
+            boolean showSleeve = !WawelAuthCompat.isRightSleeveHidden(p_82441_1_);
+            boolean render3DSleeve = showSleeve
+                && model.prepare3DRightArmWear((AbstractClientPlayer)p_82441_1_);
+            rightArmWear.showModel = showSleeve && !render3DSleeve;
             model.onGround = 0.0f;
             model.setRotationAngles(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0625f, p_82441_1_);
             model.prepareModernOverlays();
             model.bipedRightArm.render(0.0625f);
+            if (render3DSleeve) {
+                model.render3DRightArmWear(0.0625f);
+            }
             rightArmWear.showModel = wearVisible;
+            model.prepareModernOverlays();
             return;
         }
 

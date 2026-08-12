@@ -1,10 +1,14 @@
 package net.gobbob.mobends.client.model.entity;
 
+import java.util.UUID;
+
 import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.client.model.ModelBoxBends;
 import net.gobbob.mobends.client.model.ModelRendererBends;
 import net.gobbob.mobends.client.model.ModelRendererBends_SeperatedChild;
 import net.gobbob.mobends.client.renderer.SwordTrail;
+import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
+import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
 import net.gobbob.mobends.data.Data_Player;
 import net.gobbob.mobends.pack.BendsPack;
 import net.gobbob.mobends.pack.BendsVar;
@@ -44,6 +48,7 @@ extends ModelBiped {
 
     private boolean modern;
     private boolean slim;
+    private UUID currentPlayerUuid;
 
     private ModelRendererBends bodyWear;
     private ModelRendererBends rightLegWear;
@@ -151,6 +156,44 @@ extends ModelBiped {
     public void render(Entity argEntity, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_) {
         this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, argEntity);
         this.prepareModernOverlays();
+
+        Layers layers3D = null;
+        if (this.modern && argEntity instanceof AbstractClientPlayer) {
+            this.currentPlayerUuid = argEntity.getUniqueID();
+            layers3D = WawelAuth3DSkinLayers.getLayers(this.currentPlayerUuid, this.slim);
+        }
+
+        boolean headWearVisible = this.bipedHeadwear.showModel;
+        boolean bodyWearVisible = this.modern && this.bodyWear.showModel;
+        boolean rightArmWearVisible = this.modern && this.getRightArmWear().showModel;
+        boolean leftArmWearVisible = this.modern && this.getLeftArmWear().showModel;
+        boolean rightLegWearVisible = this.modern && this.rightLegWear.showModel;
+        boolean leftLegWearVisible = this.modern && this.leftLegWear.showModel;
+
+        boolean renderHat3D = false;
+        boolean renderJacket3D = false;
+        boolean renderRightSleeve3D = false;
+        boolean renderLeftSleeve3D = false;
+        boolean renderRightPants3D = false;
+        boolean renderLeftPants3D = false;
+        if (layers3D != null && argEntity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer)argEntity;
+            renderHat3D = layers3D.hasHat() && headWearVisible && player.inventory.armorItemInSlot(3) == null;
+            renderJacket3D = layers3D.hasJacket() && bodyWearVisible && player.inventory.armorItemInSlot(2) == null;
+            renderRightSleeve3D = layers3D.hasRightSleeve() && rightArmWearVisible && player.inventory.armorItemInSlot(2) == null;
+            renderLeftSleeve3D = layers3D.hasLeftSleeve() && leftArmWearVisible && player.inventory.armorItemInSlot(2) == null;
+            boolean legsUnarmored = player.inventory.armorItemInSlot(1) == null && player.inventory.armorItemInSlot(0) == null;
+            renderRightPants3D = layers3D.hasRightPants() && rightLegWearVisible && legsUnarmored;
+            renderLeftPants3D = layers3D.hasLeftPants() && leftLegWearVisible && legsUnarmored;
+
+            if (renderHat3D) this.bipedHeadwear.showModel = false;
+            if (renderJacket3D) this.bodyWear.showModel = false;
+            if (renderRightSleeve3D) this.setRightSleeveVisible(false);
+            if (renderLeftSleeve3D) this.setLeftSleeveVisible(false);
+            if (renderRightPants3D) this.setRightPantsVisible(false);
+            if (renderLeftPants3D) this.setLeftPantsVisible(false);
+        }
+
         if (this.isChild) {
             float f6 = 2.0f;
             GL11.glPushMatrix();
@@ -172,6 +215,27 @@ extends ModelBiped {
             this.bipedBody.render(p_78088_7_);
             this.bipedRightLeg.render(p_78088_7_);
             this.bipedLeftLeg.render(p_78088_7_);
+        }
+
+        if (layers3D != null) {
+            this.render3DLayers(
+                p_78088_7_,
+                layers3D,
+                renderHat3D,
+                renderJacket3D,
+                renderRightSleeve3D,
+                renderLeftSleeve3D,
+                renderRightPants3D,
+                renderLeftPants3D);
+        }
+
+        this.bipedHeadwear.showModel = headWearVisible;
+        if (this.modern) {
+            this.bodyWear.showModel = bodyWearVisible;
+            this.setRightSleeveVisible(rightArmWearVisible);
+            this.setLeftSleeveVisible(leftArmWearVisible);
+            this.setRightPantsVisible(rightLegWearVisible);
+            this.setLeftPantsVisible(leftLegWearVisible);
         }
     }
 
@@ -415,11 +479,32 @@ extends ModelBiped {
     }
 
     public void render3DRightArmWear(float scale) {
-        // WawelAuth's voxel meshes use vanilla single-piece transforms. The segmented model intentionally falls back to 2D.
+        Layers layers = WawelAuth3DSkinLayers.getLayers(this.currentPlayerUuid, this.slim);
+        if (layers == null || !layers.hasRightSleeve()) {
+            return;
+        }
+
+        boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        this.renderRightSleeve3D(scale, layers, false);
+        if (!blendEnabled) {
+            GL11.glDisable(GL11.GL_BLEND);
+        }
     }
 
     public void setCurrentPlayerUuid(java.util.UUID uuid) {
-        // Kept for WawelAuth's injected interface. UUID state is owned by WawelAuth.
+        this.currentPlayerUuid = uuid;
+    }
+
+    public boolean prepare3DRightArmWear(AbstractClientPlayer player) {
+        if (!this.modern || player == null) {
+            return false;
+        }
+        this.currentPlayerUuid = player.getUniqueID();
+        WawelAuth3DSkinLayers.ensurePlayerState(player, this.slim);
+        Layers layers = WawelAuth3DSkinLayers.getLayers(this.currentPlayerUuid, this.slim);
+        return layers != null && layers.hasRightSleeve();
     }
 
     public ModelRenderer getBodyWear() {
@@ -453,6 +538,173 @@ extends ModelBiped {
         this.slimLeftForeArmWear.showModel = this.slim && this.slimLeftArmWear.showModel;
         this.rightForeLegWear.showModel = this.rightLegWear.showModel;
         this.leftForeLegWear.showModel = this.leftLegWear.showModel;
+    }
+
+    private void render3DLayers(float scale, Layers layers, boolean hat, boolean jacket, boolean rightSleeve,
+        boolean leftSleeve, boolean rightPants, boolean leftPants) {
+        boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        if (this.isChild) {
+            float childScale = 2.0f;
+            if (hat) {
+                GL11.glPushMatrix();
+                GL11.glScalef(1.5f / childScale, 1.5f / childScale, 1.5f / childScale);
+                GL11.glTranslatef(0.0f, 16.0f * scale, 0.0f);
+                this.renderHat3D(scale, layers, false);
+                GL11.glPopMatrix();
+            }
+
+            GL11.glPushMatrix();
+            GL11.glScalef(1.0f / childScale, 1.0f / childScale, 1.0f / childScale);
+            GL11.glTranslatef(0.0f, 24.0f * scale, 0.0f);
+            if (jacket) this.renderJacket3D(scale, layers);
+            if (rightSleeve) this.renderRightSleeve3D(scale, layers, true);
+            if (leftSleeve) this.renderLeftSleeve3D(scale, layers);
+            if (rightPants) this.renderRightPants3D(scale, layers);
+            if (leftPants) this.renderLeftPants3D(scale, layers);
+            GL11.glPopMatrix();
+        } else {
+            if (hat) this.renderHat3D(scale, layers, true);
+            if (jacket) this.renderJacket3D(scale, layers);
+            if (rightSleeve) this.renderRightSleeve3D(scale, layers, true);
+            if (leftSleeve) this.renderLeftSleeve3D(scale, layers);
+            if (rightPants) this.renderRightPants3D(scale, layers);
+            if (leftPants) this.renderLeftPants3D(scale, layers);
+        }
+
+        if (!blendEnabled) {
+            GL11.glDisable(GL11.GL_BLEND);
+        }
+    }
+
+    private void renderHat3D(float scale, Layers layers, boolean includeBody) {
+        float voxel = WawelAuth3DSkinLayers.getHeadVoxelSize();
+        if (includeBody) {
+            this.renderAttached(layers.hat, scale, voxel, voxel, voxel, 0.0f, 0.0f, 0.0f,
+                (ModelRendererBends)this.bipedBody, (ModelRendererBends)this.bipedHead);
+        } else {
+            this.renderAttached(layers.hat, scale, voxel, voxel, voxel, 0.0f, 0.0f, 0.0f,
+                (ModelRendererBends)this.bipedHead);
+        }
+    }
+
+    private void renderJacket3D(float scale, Layers layers) {
+        this.renderAttached(
+            layers.jacket,
+            scale,
+            WawelAuth3DSkinLayers.getBodyVoxelWidthSize(),
+            1.035f,
+            WawelAuth3DSkinLayers.getBaseVoxelSize(),
+            0.0f,
+            -12.2f,
+            0.0f,
+            (ModelRendererBends)this.bipedBody);
+    }
+
+    private void renderRightSleeve3D(float scale, Layers layers, boolean includeBody) {
+        float voxel = WawelAuth3DSkinLayers.getBaseVoxelSize();
+        float upperX = this.slim ? -0.499f : -0.998f;
+        if (includeBody) {
+            this.renderAttached(layers.rightArm, scale, voxel, 1.035f, voxel, upperX, -0.1f, 0.0f,
+                (ModelRendererBends)this.bipedBody, (ModelRendererBends)this.bipedRightArm);
+            this.renderAttached(layers.rightForeArm, scale, voxel, 1.035f, voxel,
+                (this.slim ? 3.0f : 4.0f) / 2.0f, -0.1f, -2.0f,
+                (ModelRendererBends)this.bipedBody, (ModelRendererBends)this.bipedRightArm,
+                (ModelRendererBends)this.bipedRightForeArm);
+        } else {
+            this.renderAttached(layers.rightArm, scale, voxel, 1.035f, voxel, upperX, -0.1f, 0.0f,
+                (ModelRendererBends)this.bipedRightArm);
+            this.renderAttached(layers.rightForeArm, scale, voxel, 1.035f, voxel,
+                (this.slim ? 3.0f : 4.0f) / 2.0f, -0.1f, -2.0f,
+                (ModelRendererBends)this.bipedRightArm, (ModelRendererBends)this.bipedRightForeArm);
+        }
+    }
+
+    private void renderLeftSleeve3D(float scale, Layers layers) {
+        float voxel = WawelAuth3DSkinLayers.getBaseVoxelSize();
+        float upperX = this.slim ? 0.499f : 0.998f;
+        this.renderAttached(layers.leftArm, scale, voxel, 1.035f, voxel, upperX, -0.1f, 0.0f,
+            (ModelRendererBends)this.bipedBody, (ModelRendererBends)this.bipedLeftArm);
+        this.renderAttached(layers.leftForeArm, scale, voxel, 1.035f, voxel,
+            (this.slim ? 3.0f : 4.0f) / 2.0f, -0.1f, -2.0f,
+            (ModelRendererBends)this.bipedBody, (ModelRendererBends)this.bipedLeftArm,
+            (ModelRendererBends)this.bipedLeftForeArm);
+    }
+
+    private void renderRightPants3D(float scale, Layers layers) {
+        float voxel = WawelAuth3DSkinLayers.getBaseVoxelSize();
+        this.renderAttached(layers.rightLeg, scale, voxel, 1.035f, voxel, 0.0f, -0.2f, 0.0f,
+            (ModelRendererBends)this.bipedRightLeg);
+        this.renderAttached(layers.rightForeLeg, scale, voxel, 1.035f, voxel, 0.0f, -0.2f, 2.0f,
+            (ModelRendererBends)this.bipedRightLeg, (ModelRendererBends)this.bipedRightForeLeg);
+    }
+
+    private void renderLeftPants3D(float scale, Layers layers) {
+        float voxel = WawelAuth3DSkinLayers.getBaseVoxelSize();
+        this.renderAttached(layers.leftLeg, scale, voxel, 1.035f, voxel, 0.0f, -0.2f, 0.0f,
+            (ModelRendererBends)this.bipedLeftLeg);
+        this.renderAttached(layers.leftForeLeg, scale, voxel, 1.035f, voxel, 0.0f, -0.2f, 2.0f,
+            (ModelRendererBends)this.bipedLeftLeg, (ModelRendererBends)this.bipedLeftForeLeg);
+    }
+
+    private void renderAttached(Object mesh, float scale, float voxelX, float voxelY, float voxelZ,
+        float localOffsetX, float localOffsetY, float localOffsetZ, ModelRendererBends... hierarchy) {
+        if (mesh == null) {
+            return;
+        }
+        GL11.glPushMatrix();
+        for (ModelRendererBends part : hierarchy) {
+            this.applyTransform(part, scale);
+        }
+        WawelAuth3DSkinLayers.renderMesh(
+            mesh,
+            scale,
+            voxelX,
+            voxelY,
+            voxelZ,
+            localOffsetX,
+            localOffsetY,
+            localOffsetZ);
+        GL11.glPopMatrix();
+    }
+
+    private void applyTransform(ModelRendererBends part, float scale) {
+        part.updateBends(scale);
+        GL11.glTranslatef(part.offsetX, part.offsetY, part.offsetZ);
+        GL11.glTranslatef(part.rotationPointX * scale, part.rotationPointY * scale, part.rotationPointZ * scale);
+        GL11.glRotatef(-part.pre_rotation.getY(), 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef(part.pre_rotation.getX(), 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(part.pre_rotation.getZ(), 0.0f, 0.0f, 1.0f);
+        if (part.rotateAngleZ != 0.0f) GL11.glRotatef(part.rotateAngleZ * 57.295776f, 0.0f, 0.0f, 1.0f);
+        if (part.rotateAngleY != 0.0f) GL11.glRotatef(part.rotateAngleY * 57.295776f, 0.0f, 1.0f, 0.0f);
+        if (part.rotateAngleX != 0.0f) GL11.glRotatef(part.rotateAngleX * 57.295776f, 1.0f, 0.0f, 0.0f);
+        GL11.glScalef(part.scaleX, part.scaleY, part.scaleZ);
+    }
+
+    private void setRightSleeveVisible(boolean visible) {
+        this.classicRightArmWear.showModel = !this.slim && visible;
+        this.classicRightForeArmWear.showModel = !this.slim && visible;
+        this.slimRightArmWear.showModel = this.slim && visible;
+        this.slimRightForeArmWear.showModel = this.slim && visible;
+    }
+
+    private void setLeftSleeveVisible(boolean visible) {
+        this.classicLeftArmWear.showModel = !this.slim && visible;
+        this.classicLeftForeArmWear.showModel = !this.slim && visible;
+        this.slimLeftArmWear.showModel = this.slim && visible;
+        this.slimLeftForeArmWear.showModel = this.slim && visible;
+    }
+
+    private void setRightPantsVisible(boolean visible) {
+        this.rightLegWear.showModel = visible;
+        this.rightForeLegWear.showModel = visible;
+    }
+
+    private void setLeftPantsVisible(boolean visible) {
+        this.leftLegWear.showModel = visible;
+        this.leftForeLegWear.showModel = visible;
     }
 
     private void addArmChildren(ModelRendererBends parent, ModelRendererBends classicPart, ModelRendererBends slimPart,
