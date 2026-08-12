@@ -8,6 +8,7 @@ import net.gobbob.mobends.animation.player.Animation_Attack;
 import net.gobbob.mobends.animation.player.Animation_Axe;
 import net.gobbob.mobends.animation.player.Animation_Bow;
 import net.gobbob.mobends.animation.player.Animation_Climbing;
+import net.gobbob.mobends.animation.player.Animation_Diving;
 import net.gobbob.mobends.animation.player.Animation_Falling;
 import net.gobbob.mobends.animation.player.Animation_Flying;
 import net.gobbob.mobends.animation.player.Animation_Jump;
@@ -73,6 +74,7 @@ public class AnimatedEntity {
                         .add(new Animation_Falling())
                         .add(new Animation_Flying())
                         .add(new Animation_Climbing())
+                        .add(new Animation_Diving())
                         .add(new Animation_Attack())
                         .add(new Animation_Swimming())
                         .add(new Animation_Bow())

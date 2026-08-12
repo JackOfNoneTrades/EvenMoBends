@@ -17,6 +17,7 @@ import net.gobbob.mobends.pack.BendsPack;
 import net.gobbob.mobends.pack.BendsVar;
 import net.gobbob.mobends.util.SmoothVector3f;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
@@ -292,15 +293,19 @@ extends ModelBiped {
             EntityPlayer player = (EntityPlayer)argEntity;
             boolean elytraFlying = EtFuturumRequiemCompat.isElytraFlying(player);
             boolean creativeFlying = player.capabilities.isFlying && !data.isOnGround();
+            boolean touchingWater = this.isTouchingWater(argEntity);
+            boolean groundedInWater = touchingWater && data.isOnGround();
             if ((elytraFlying || creativeFlying) && this.animatePlayer("flying", argEntity, data)) {
                 // Flight takes precedence over the ordinary airborne animations.
             } else if (argEntity.isRiding()) {
                 this.animatePlayer("riding", argEntity, data);
-            } else if (argEntity.isInWater()) {
-                this.animatePlayer("swimming", argEntity, data);
+            } else if (touchingWater && !groundedInWater) {
+                if (!this.shouldAnimateDiving(argEntity, data) || !this.animatePlayer("diving", argEntity, data)) {
+                    this.animatePlayer("swimming", argEntity, data);
+                }
             } else if (player.isOnLadder() && this.animatePlayer("climbing", argEntity, data)) {
                 // Climbing takes precedence over the ordinary airborne animations.
-            } else if (!Data_Player.get(argEntity.getEntityId()).isOnGround() | Data_Player.get((int)argEntity.getEntityId()).ticksAfterTouchdown < 2.0f) {
+            } else if (!data.isOnGround() || !groundedInWater && data.ticksAfterTouchdown < 2.0f) {
                 if (!this.shouldAnimateFalling(argEntity, data) || !this.animatePlayer("falling", argEntity, data)) {
                     this.animatePlayer("jump", argEntity, data);
                 }
@@ -365,6 +370,17 @@ extends ModelBiped {
             && data.ticksAfterLiftoff > 3.0f
             && data.motion.y < -0.08f
             && entity.fallDistance >= 3.0f;
+    }
+
+    private boolean shouldAnimateDiving(Entity entity, Data_Player data) {
+        double horizontalSpeedSquared = data.motion.x * data.motion.x + data.motion.z * data.motion.z;
+        return entity.isInsideOfMaterial(Material.water)
+            && (horizontalSpeedSquared > 0.0004 || Math.abs(data.motion.y) > 0.02);
+    }
+
+    private boolean isTouchingWater(Entity entity) {
+        return entity.isInWater()
+            || entity.worldObj.isMaterialInBB(entity.boundingBox.contract(0.001, 0.001, 0.001), Material.water);
     }
 
     public void postRender(float argScale) {

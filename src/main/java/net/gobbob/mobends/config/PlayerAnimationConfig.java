@@ -15,6 +15,7 @@ public final class PlayerAnimationConfig {
     private static boolean flying = true;
     private static boolean climbing = true;
     private static boolean swimming = true;
+    private static boolean diving = true;
     private static boolean bow = true;
     private static boolean riding = true;
     private static boolean mining = true;
@@ -39,6 +40,7 @@ public final class PlayerAnimationConfig {
         flying = read(config, "flying", "Creative flight and Et Futurum Requiem Elytra flight pose.");
         climbing = read(config, "climbing", "Vanilla ladder and vine climbing pose.");
         swimming = read(config, "swimming", "Surface and idle swimming animation.");
+        diving = read(config, "diving", "Directional animation used while moving fully underwater.");
         bow = read(config, "bow", "Bow aiming pose.");
         riding = read(config, "riding", "Mounted player pose.");
         mining = read(config, "mining", "Pickaxe and block-mining pose.");
@@ -62,6 +64,7 @@ public final class PlayerAnimationConfig {
         write(config, "flying", flying);
         write(config, "climbing", climbing);
         write(config, "swimming", swimming);
+        write(config, "diving", diving);
         write(config, "bow", bow);
         write(config, "riding", riding);
         write(config, "mining", mining);
@@ -85,6 +88,7 @@ public final class PlayerAnimationConfig {
         if ("flying".equals(animation)) return flying;
         if ("climbing".equals(animation)) return climbing;
         if ("swimming".equals(animation)) return swimming;
+        if ("diving".equals(animation)) return diving;
         if ("bow".equals(animation)) return bow;
         if ("riding".equals(animation)) return riding;
         if ("mining".equals(animation)) return mining;
