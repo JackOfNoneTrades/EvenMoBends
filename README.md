@@ -30,10 +30,16 @@ Maintainable Minecraft 1.7.10 fork of Mo' Bends 0.20.1 with Wawel Auth and Smart
 ./gradlew build
 ```
 
-The development client can load makamys' Smart Moving stack without making it a published dependency:
+The default development client includes WawelAuth and GTNH Et Futurum Requiem for compatibility testing. Launch it on Java 25 from this repository:
 
 ```sh
-./gradlew -PsmartMoving runClient
+./gradlew runClient25
+```
+
+It can additionally load makamys' Smart Moving stack without making it a published dependency:
+
+```sh
+./gradlew -PsmartMoving runClient25
 ```
 
 ## Credits

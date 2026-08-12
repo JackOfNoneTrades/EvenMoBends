@@ -1,4 +1,13 @@
 dependencies {
+    // The compatibility stack used by the default EvenMoBends development client.
+    // These are deliberately not published as hard dependencies of EvenMoBends.
+    devOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:${gtnhLibVersion}:dev")
+    devOnlyNonPublishable("org.fentanylsolutions.fentlib:FentLib:${fentLibVersion}:dev")
+    devOnlyNonPublishable("com.github.GTNewHorizons:ModularUI2:${modularUI2Version}:dev")
+    devOnlyNonPublishable("org.fentanylsolutions.wawelauth:WawelAuth:${wawelAuthVersion}:dev")
+    devOnlyNonPublishable("ganymedes01.etfuturum:Et-Futurum-Requiem:${etFuturumRequiemVersion}:dev")
+
+    // Opt in when testing the Smart Moving policy; its presence intentionally disables player bends.
     if (project.hasProperty("smartMoving")) {
         devOnlyNonPublishable(rfg.deobf("net.smart:SmartMoving:1.7.10-15.8.2-maka"))
         devOnlyNonPublishable(rfg.deobf("api.player:PlayerAPI:1.7.10-1.4.1-maka"))
