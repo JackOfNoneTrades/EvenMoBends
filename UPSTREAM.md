@@ -25,6 +25,16 @@ tools/recover-upstream.sh "/path/to/MoBends-0.20.1 for MC 1.7.10.jar" /tmp/moben
 
 ## License and authorship
 
-Mo' Bends is distributed under the MIT License. The repository retains the upstream license in `LICENSE`. The recovered code remains attributable to the original Mo' Bends author, Iwo Plaza / GobBob; fork-specific changes should be identified in Git history.
+Mo' Bends is distributed under the MIT License. The repository retains that license in `LICENSES/MIT.txt`. The recovered code remains attributable to the original Mo' Bends author, Iwo Plaza / GobBob; fork-specific changes should be identified in Git history.
+
+Some player animations are adapted from makamys' Smart Moving fork, which is GPL-3.0-or-later. Each derived source file carries an SPDX GPL marker and an upstream reference. Combined Even Mo' Bends binaries containing this code are therefore distributed under GPL-3.0-or-later; independently MIT-licensed source files remain available under MIT.
+
+### Smart Moving input
+
+- Repository: `https://github.com/makamys/SmartMoving`
+- Tag: `15.8.2-maka`
+- Commit: `4fe6a9dd080162859b3630b6a886bfe47d50f009`
+- Relevant source: `src/main/java/net/smart/moving/render/SmartMovingModel.java`
+- License: GNU General Public License version 3 or later
 
 No source or assets from MoBends-Reforged or Astryxion projects are used here.

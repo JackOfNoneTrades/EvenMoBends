@@ -3,12 +3,14 @@ package net.gobbob.mobends.client.model.entity;
 import java.util.UUID;
 
 import net.gobbob.mobends.AnimatedEntity;
+import net.gobbob.mobends.animation.Animation;
 import net.gobbob.mobends.client.model.ModelBoxBends;
 import net.gobbob.mobends.client.model.ModelRendererBends;
 import net.gobbob.mobends.client.model.ModelRendererBends_SeperatedChild;
 import net.gobbob.mobends.client.renderer.SwordTrail;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
+import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.data.Data_Player;
 import net.gobbob.mobends.pack.BendsPack;
 import net.gobbob.mobends.pack.BendsVar;
@@ -287,42 +289,35 @@ extends ModelBiped {
             ((ModelRendererBends)this.bipedLeftForeLeg).resetScale();
             BendsVar.tempData = Data_Player.get(argEntity.getEntityId());
             if (argEntity.isRiding()) {
-                AnimatedEntity.getByEntity(argEntity).get("riding").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "riding");
+                this.animatePlayer("riding", argEntity, data);
             } else if (argEntity.isInWater()) {
-                AnimatedEntity.getByEntity(argEntity).get("swimming").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "swimming");
+                this.animatePlayer("swimming", argEntity, data);
             } else if (!Data_Player.get(argEntity.getEntityId()).isOnGround() | Data_Player.get((int)argEntity.getEntityId()).ticksAfterTouchdown < 2.0f) {
-                AnimatedEntity.getByEntity(argEntity).get("jump").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "jump");
+                if (!this.shouldAnimateFalling(argEntity, data) || !this.animatePlayer("falling", argEntity, data)) {
+                    this.animatePlayer("jump", argEntity, data);
+                }
             } else {
                 if (Data_Player.get((int)argEntity.getEntityId()).motion.x == 0.0f & Data_Player.get((int)argEntity.getEntityId()).motion.z == 0.0f) {
-                    AnimatedEntity.getByEntity(argEntity).get("stand").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                    BendsPack.animate(this, "player", "stand");
+                    this.animatePlayer("stand", argEntity, data);
                 } else if (argEntity.isSprinting()) {
-                    AnimatedEntity.getByEntity(argEntity).get("sprint").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                    BendsPack.animate(this, "player", "sprint");
+                    if (!this.animatePlayer("sprint", argEntity, data)) {
+                        this.animatePlayer("walk", argEntity, data);
+                    }
                 } else {
-                    AnimatedEntity.getByEntity(argEntity).get("walk").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                    BendsPack.animate(this, "player", "walk");
+                    this.animatePlayer("walk", argEntity, data);
                 }
                 if (argEntity.isSneaking()) {
-                    AnimatedEntity.getByEntity(argEntity).get("sneak").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                    BendsPack.animate(this, "player", "sneak");
+                    this.animatePlayer("sneak", argEntity, data);
                 }
             }
             if (this.aimedBow) {
-                AnimatedEntity.getByEntity(argEntity).get("bow").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "bow");
+                this.animatePlayer("bow", argEntity, data);
             } else if (((EntityPlayer)argEntity).getCurrentEquippedItem() != null && ((EntityPlayer)argEntity).getCurrentEquippedItem().getItem() instanceof ItemPickaxe || ((EntityPlayer)argEntity).getCurrentEquippedItem() != null && Block.getBlockFromItem(((EntityPlayer)argEntity).getCurrentEquippedItem().getItem()) != Blocks.air) {
-                AnimatedEntity.getByEntity(argEntity).get("mining").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "mining");
+                this.animatePlayer("mining", argEntity, data);
             } else if (((EntityPlayer)argEntity).getCurrentEquippedItem() != null && ((EntityPlayer)argEntity).getCurrentEquippedItem().getItem() instanceof ItemAxe) {
-                AnimatedEntity.getByEntity(argEntity).get("axe").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "axe");
+                this.animatePlayer("axe", argEntity, data);
             } else {
-                AnimatedEntity.getByEntity(argEntity).get("attack").animate((EntityLivingBase)argEntity, this, Data_Player.get(argEntity.getEntityId()));
-                BendsPack.animate(this, "player", "attack");
+                this.animatePlayer("attack", argEntity, data);
             }
             ((ModelRendererBends)this.bipedHead).update(data.ticksPerFrame);
             ((ModelRendererBends)this.bipedHeadwear).update(data.ticksPerFrame);
@@ -342,6 +337,26 @@ extends ModelBiped {
             data.updatedThisFrame = true;
         }
         Data_Player.get(argEntity.getEntityId()).syncModelInfo(this);
+    }
+
+    private boolean animatePlayer(String animationName, Entity entity, Data_Player data) {
+        if (!PlayerAnimationConfig.isEnabled(animationName)) {
+            return false;
+        }
+        Animation animation = AnimatedEntity.getByEntity(entity).get(animationName);
+        if (animation == null) {
+            return false;
+        }
+        animation.animate((EntityLivingBase)entity, this, data);
+        BendsPack.animate(this, "player", animationName);
+        return true;
+    }
+
+    private boolean shouldAnimateFalling(Entity entity, Data_Player data) {
+        return !data.isOnGround()
+            && data.ticksAfterLiftoff > 3.0f
+            && data.motion.y < -0.08f
+            && entity.fallDistance >= 3.0f;
     }
 
     public void postRender(float argScale) {

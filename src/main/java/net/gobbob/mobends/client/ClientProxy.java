@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.CommonProxy;
 import net.gobbob.mobends.compat.CompatibilityPolicy;
+import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.event.EventHandler_DataUpdate;
 import net.gobbob.mobends.event.EventHandler_Keyboard;
 import net.gobbob.mobends.pack.BendsPack;
@@ -23,6 +24,7 @@ extends CommonProxy {
     @Override
     public void preInit(Configuration config) {
         CompatibilityPolicy.logActiveMode();
+        PlayerAnimationConfig.load(config);
         for (int i = 0; i < AnimatedEntity.animatedEntities.length; ++i) {
             AnimatedEntity.animatedEntities[i].animate = config.get("Animate", AnimatedEntity.animatedEntities[i].id, true).getBoolean();
         }

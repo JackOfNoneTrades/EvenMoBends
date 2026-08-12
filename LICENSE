@@ -1,21 +1,20 @@
-MIT License
+Even Mo' Bends licensing
+========================
 
-Copyright (c) 2017 Iwo Plaza
+This repository is a mixed-license source tree.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+- Code and assets inherited from Mo' Bends, plus fork-specific work not marked
+  otherwise, are available under the MIT License. See LICENSES/MIT.txt.
+- Files derived from Smart Moving are marked with
+  `SPDX-License-Identifier: GPL-3.0-or-later` and are available under the GNU
+  General Public License version 3 or later. See
+  LICENSES/GPL-3.0-or-later.txt.
+- A file containing both MIT-licensed Mo' Bends material and Smart
+  Moving-derived material is distributed under GPL-3.0-or-later while
+  retaining the original MIT copyright and permission notice.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Combined Even Mo' Bends binaries containing Smart Moving-derived code are
+distributed under GPL-3.0-or-later. This does not remove or restrict the MIT
+license on source files that remain independently available under MIT.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Upstream authorship and exact source inputs are documented in UPSTREAM.md.
