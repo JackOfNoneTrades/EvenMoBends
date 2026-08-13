@@ -6,9 +6,13 @@ import java.awt.Frame;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import javax.imageio.ImageIO;
 import net.gobbob.mobends.client.render.BlinkSkinExporter;
 import net.gobbob.mobends.client.render.BlinkingTextures;
+import net.gobbob.mobends.compat.WawelAuthCompat;
+import net.gobbob.mobends.compat.WawelAuthSkinUpload;
+import net.gobbob.mobends.compat.WawelAuthSkinUpload.Account;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -56,6 +60,7 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     private long blinkStartedAt = Long.MIN_VALUE;
     private boolean replaceArmed;
     private boolean editorDataLoaded;
+    private boolean uploading;
 
     public GuiBlinkSkinEditor(GuiScreen parent) {
         this.parent = parent;
@@ -78,10 +83,16 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         this.buttonList.add(new GuiButton(3, x, y + 119, 182, 20, "Pick color from skin"));
         this.buttonList.add(new GuiButton(4, x, this.height - 50, 88, 20, "Blink"));
         this.buttonList.add(new GuiButton(5, x + 94, this.height - 50, 88, 20, "Clear all"));
-        GuiButton export = new GuiButton(6, x, this.height - 72, 182, 20, "Export PNG...");
+        int bottomY = this.height - 28;
+        int bottomX = this.width / 2 - 116;
+        GuiButton upload = new GuiWawelAuthIconButton(14, bottomX, bottomY);
+        upload.visible = WawelAuthCompat.isLoaded();
+        upload.enabled = this.skin != null && hasSelection() && !this.uploading;
+        this.buttonList.add(upload);
+        this.buttonList.add(new GuiButton(7, bottomX + 24, bottomY, 88, 20, "Back"));
+        GuiButton export = new GuiButton(6, bottomX + 116, bottomY, 116, 20, "Export PNG...");
         export.enabled = this.skin != null && hasSelection();
         this.buttonList.add(export);
-        this.buttonList.add(new GuiButton(7, this.width / 2 - 50, this.height - 28, 100, 20, "Back"));
         this.hexField = new GuiTextField(this.fontRendererObj, x + 42, pickerY() + PICKER_HEIGHT + 4, 78, 18);
         this.hexField.setMaxStringLength(7);
         this.hexField.setText("#FFFFFF");
@@ -110,6 +121,8 @@ public class GuiBlinkSkinEditor extends GuiScreen {
             this.status = "Mark the complete eye region, then mark which pixels are pupils.";
         } else if (button.id == 6) {
             exportSkin();
+        } else if (button.id == 14) {
+            confirmWawelAuthUpload();
         } else if (button.id == 7) {
             this.mc.displayGuiScreen(this.parent);
         }
@@ -235,6 +248,11 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         this.fontRendererObj.drawSplitString(this.status, canvasX(), canvasY() + 145, 165,
             this.status.startsWith("Saved") ? 0x55ff55 : 0xbfbfbf);
         super.drawScreen(mouseX, mouseY, partialTicks);
+        GuiButton upload = getButton(14);
+        if (upload != null && upload.visible && mouseX >= upload.xPosition && mouseX < upload.xPosition + upload.width
+            && mouseY >= upload.yPosition && mouseY < upload.yPosition + upload.height) {
+            this.func_146283_a(Collections.singletonList("Upload via Wawel Auth"), mouseX, mouseY);
+        }
     }
 
     private void drawAnimatedFace() {
@@ -436,6 +454,46 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         } catch (IOException exception) {
             this.status = "Could not save: " + exception.getMessage();
         }
+    }
+
+    private BufferedImage generatedSkin() {
+        return BlinkSkinExporter.export(
+            this.skin, this.eyeGroups, this.pupils, this.closedColors, this.pupilBackgroundColors,
+            this.eyebrowGroups, this.eyebrowColors);
+    }
+
+    private void confirmWawelAuthUpload() {
+        Account account = WawelAuthSkinUpload.activeAccount();
+        if (account == null) {
+            this.status = "No active Wawel Auth account. Activate an account before uploading.";
+            return;
+        }
+        this.mc.displayGuiScreen(new GuiWawelAuthUploadConfirm(account, confirmed -> {
+            this.mc.displayGuiScreen(this);
+            if (!confirmed) {
+                this.status = "Wawel Auth upload cancelled.";
+                return;
+            }
+            startWawelAuthUpload(account);
+        }));
+    }
+
+    private void startWawelAuthUpload(Account account) {
+        this.uploading = true;
+        this.status = "Uploading skin for " + account.name + " via " + account.provider + "...";
+        updateExportButton();
+        BufferedImage output = generatedSkin();
+        boolean slim = WawelAuthCompat.isSlim(this.mc.thePlayer);
+        WawelAuthSkinUpload.upload(account, output, slim, (result, error) -> {
+            this.uploading = false;
+            if (error != null) {
+                this.status = "Wawel Auth upload failed: " + error;
+            } else {
+                BlinkingTextures.invalidatePlayer(account.uuid);
+                this.status = result == null ? "Uploaded skin via Wawel Auth." : result;
+            }
+            updateExportButton();
+        });
     }
 
     private void setTool(Tool tool) {
@@ -724,7 +782,11 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     private void updateExportButton() {
         GuiButton button = getButton(6);
         if (button != null) {
-            button.enabled = this.skin != null && hasSelection();
+            button.enabled = this.skin != null && hasSelection() && !this.uploading;
+        }
+        GuiButton upload = getButton(14);
+        if (upload != null) {
+            upload.enabled = this.skin != null && hasSelection() && !this.uploading;
         }
     }
 
@@ -749,11 +811,11 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     }
 
     private int canvasX() {
-        return this.width / 2 - 170;
+        return this.width / 2 - 185;
     }
 
     private int canvasY() {
-        return Math.max(38, this.height / 2 - 70);
+        return Math.max(30, this.height / 2 - 85);
     }
 
     private int controlsX() {

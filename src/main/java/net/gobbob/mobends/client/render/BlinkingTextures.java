@@ -118,6 +118,22 @@ public final class BlinkingTextures implements IResourceManagerReloadListener {
         return source == null || source.image == null ? null : copy(source.image);
     }
 
+    /** Discard generated blink and expression textures after a player's source skin changes. */
+    public static void invalidatePlayer(UUID uuid) {
+        if (uuid == null) return;
+        PlayerBlinkTextures cached = PLAYER_CACHE.remove(uuid);
+        if (cached == null) return;
+        TextureManager manager = Minecraft.getMinecraft().getTextureManager();
+        if (cached.blink != null) manager.deleteTexture(cached.blink);
+        if (cached.blink2 != null) manager.deleteTexture(cached.blink2);
+        if (cached.smoothFrames != null) {
+            for (ResourceLocation frame : cached.smoothFrames) {
+                if (frame != null) manager.deleteTexture(frame);
+            }
+        }
+        deleteExpressionTextures(manager, cached);
+    }
+
     public static ResourceLocation forMob(EntityLivingBase entity, ResourceLocation normalTexture) {
         if (!BlinkConfig.areMobsEnabled() || entity == null || normalTexture == null) {
             return normalTexture;
