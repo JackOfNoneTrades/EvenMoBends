@@ -32,23 +32,19 @@ Even Mo' Bends implements only the blinking part of that convention. Sleeping an
 By default, intermediate eyelid frames are generated and eased closed and open for a smoother, Fresh Moves-style
 blink without adding a second player body rig. Set `blinking.smoothEyelids=false` to use the authored frames directly.
 
-Pigs blink; spiders and zombie-family mobs deliberately do not. A resource pack can override a pig's generated
+Currently only pigs blink. A resource pack can override a pig's generated
 closed-eye texture by placing `_blink` before `.png`, with an optional `_blink2.png` half-closed frame. When Angelica
 Random Mobs is enabled, these companions are resolved after the pig variant, so `pig2.png` can use `pig2_blink.png`.
 
 Player blinking, smooth eyelids, pig blinking, blink frequency, and blink length are independently configurable in
 `mobends.cfg`.
 
+An ingame editor accessible from the Even Mo' Bends menu allows to easily create blinking-capable skins.
+
 ## Building
 
 ```sh
 ./gradlew build
-```
-
-The default development client includes WawelAuth and GTNH Et Futurum Requiem for compatibility testing. Launch it on Java 25 from this repository:
-
-```sh
-./gradlew runClient25
 ```
 
 It can additionally load makamys' Smart Moving stack without making it a published dependency:
