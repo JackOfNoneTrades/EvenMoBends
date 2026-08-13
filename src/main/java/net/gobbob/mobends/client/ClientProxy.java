@@ -8,7 +8,6 @@ import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.CommonProxy;
 import net.gobbob.mobends.client.render.BlinkingTextures;
 import net.gobbob.mobends.client.renderer.entity.RenderBlinkingPig;
-import net.gobbob.mobends.client.renderer.entity.RenderBlinkingPigEtFuturum;
 import net.gobbob.mobends.compat.CompatibilityPolicy;
 import net.gobbob.mobends.config.BlinkConfig;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
@@ -18,6 +17,7 @@ import net.gobbob.mobends.pack.BendsPack;
 import net.gobbob.mobends.settings.SettingsBoolean;
 import net.gobbob.mobends.settings.SettingsNode;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -50,8 +50,20 @@ extends CommonProxy {
     public void init() {
         // EFR installs its Technoblade pig renderer during init. Register after it so blinking remains active,
         // while retaining EFR's crown render pass when that mod is present.
-        RenderingRegistry.registerEntityRenderingHandler(
-            EntityPig.class,
-            Loader.isModLoaded("etfuturum") ? new RenderBlinkingPigEtFuturum() : new RenderBlinkingPig());
+        RenderingRegistry.registerEntityRenderingHandler(EntityPig.class, createPigRenderer());
+    }
+
+    private static Render createPigRenderer() {
+        if (Loader.isModLoaded("etfuturum")) {
+            try {
+                return (Render)Class.forName(
+                    "net.gobbob.mobends.client.renderer.entity.RenderBlinkingPigEtFuturum")
+                    .getDeclaredConstructor()
+                    .newInstance();
+            } catch (ReflectiveOperationException | LinkageError ignored) {
+                // Keep pig blinking usable if EFR or its renderer API differs from the tested version.
+            }
+        }
+        return new RenderBlinkingPig();
     }
 }
