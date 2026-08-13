@@ -8,6 +8,7 @@ import java.io.File;
 import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.CommonProxy;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
+import net.gobbob.mobends.config.BlinkConfig;
 import net.gobbob.mobends.pack.BendsPack;
 import net.gobbob.mobends.settings.SettingsBoolean;
 import net.gobbob.mobends.settings.SettingsNode;
@@ -42,12 +43,14 @@ public class MoBends {
         }
         config.get("General", "Sword Trail", true).setValue(((SettingsBoolean)SettingsNode.getSetting((String)"swordTrail")).data);
         config.get("General", "Current Pack", true).setValue(BendsPack.currentPack);
+        BlinkConfig.save(config);
         PlayerAnimationConfig.save(config);
         config.save();
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        proxy.init();
     }
 
     static {

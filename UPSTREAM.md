@@ -37,4 +37,14 @@ Some player animations are adapted from makamys' Smart Moving fork, which is GPL
 - Relevant source: `src/main/java/net/smart/moving/render/SmartMovingModel.java`
 - License: GNU General Public License version 3 or later
 
+### Entity Texture Features input
+
+- Repository: `https://github.com/Traben-0/Entity_Texture_Features`
+- Branch inspected: `ETF-Main`
+- Commit inspected: `a7fc2a1172264899a3fe4058c9958a2c42269920`
+- Relevant source: `ETFPlayerTexture.java`
+- Relevant documentation: `.github/README-assets/SKIN_GUIDE.md`
+- Reused scope: player-skin blink marker constants and embedded blink-frame layout only
+- License: GNU Lesser General Public License version 3 only
+
 No source or assets from MoBends-Reforged or Astryxion projects are used here.

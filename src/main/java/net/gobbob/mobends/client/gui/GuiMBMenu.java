@@ -100,6 +100,7 @@ extends GuiScreen {
         if (!this.customizeWindow & !this.settingsWindow & !this.packsWindow) {
             this.buttonList.add(new GuiButton(1, -90 + (int)(this.leftBgState * 100.0f), this.height - 30, 60, 20, "Settings"));
             this.buttonList.add(new GuiButton(3, this.width - (int)(this.leftBgState * 100.0f) + 30, this.height - 30, 60, 20, "Packs"));
+            this.buttonList.add(new GuiButton(6, this.width / 2 - 60, this.height - 30, 120, 20, "Prepare Blinking Skin"));
         }
         if (this.settingsWindow) {
             for (i = 0; i < SettingsNode.settings.length; ++i) {
@@ -457,6 +458,10 @@ extends GuiScreen {
                 --this.custom_currentChange;
                 if (this.custom_currentChange >= 0) break;
                 this.custom_currentChange = 0;
+                break;
+            }
+            case 6: {
+                Minecraft.getMinecraft().displayGuiScreen(new GuiBlinkSkinEditor(this));
             }
         }
     }

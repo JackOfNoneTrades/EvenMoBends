@@ -12,6 +12,9 @@ This repository is a mixed-license source tree.
 - A file containing both MIT-licensed Mo' Bends material and Smart
   Moving-derived material is distributed under GPL-3.0-or-later while
   retaining the original MIT copyright and permission notice.
+- The ETF-compatible blink skin parser in `BlinkingTextures.java` is
+  available under LGPL-3.0-only and retains Entity Texture Features
+  attribution in its source header. See LICENSES/LGPL-3.0-only.txt.
 
 Combined Even Mo' Bends binaries containing Smart Moving-derived code are
 distributed under GPL-3.0-or-later. This does not remove or restrict the MIT

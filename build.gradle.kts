@@ -2,6 +2,15 @@ plugins {
     id("com.gtnewhorizons.gtnhconvention")
 }
 
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
 apply(from = "https://raw.githubusercontent.com/JackOfNoneTrades/67minecraft-gradle-publish/${property("publish67ScriptTag")}/67minecraft-publish.gradle.kts")
 
 tasks.withType<Jar>().configureEach {

@@ -22,5 +22,5 @@ extends RenderSpider {
         }
         super.doRender(p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
     }
-}
 
+}

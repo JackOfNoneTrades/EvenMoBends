@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 import net.gobbob.mobends.MoBends;
 import net.gobbob.mobends.client.model.entity.ModelBendsPlayer;
+import net.gobbob.mobends.client.render.BlinkingTextures;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.compat.WawelAuthCompat;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
@@ -42,13 +43,49 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderBendsPlayer
 extends RenderPlayer {
+    private static final float MODEL_SCALE = 0.0625f;
     public int refreshModel = 0;
+    private final ModelRenderer eyebrowOverlay;
 
     public RenderBendsPlayer() {
         this.mainModel = new ModelBendsPlayer(0.0f);
         this.modelBipedMain = (ModelBendsPlayer)this.mainModel;
         this.modelArmorChestplate = new ModelBendsPlayer(1.0f);
         this.modelArmor = new ModelBendsPlayer(0.5f);
+        this.eyebrowOverlay = new ModelRenderer((ModelBiped)this.mainModel, 0, 0);
+        this.eyebrowOverlay.setTextureSize(64, 64);
+        this.eyebrowOverlay.addBox(-4.0f, -8.0f, -4.0f, 8, 8, 8, 0.02f);
+    }
+
+    @Override
+    protected ResourceLocation getEntityTexture(AbstractClientPlayer player) {
+        ResourceLocation normalTexture = super.getEntityTexture(player);
+        return BlinkingTextures.forPlayer(player, normalTexture);
+    }
+
+    @Override
+    protected void renderModel(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float age,
+        float headYaw, float headPitch, float scale) {
+        super.renderModel(entity, limbSwing, limbSwingAmount, age, headYaw, headPitch, scale);
+        if (!(entity instanceof AbstractClientPlayer) || entity.isInvisible()) {
+            return;
+        }
+        AbstractClientPlayer player = (AbstractClientPlayer)entity;
+        ModelBendsPlayer model = (ModelBendsPlayer)this.mainModel;
+        for (int group = 1; group <= 2; ++group) {
+            ResourceLocation brows = BlinkingTextures.eyebrowTexture(player, player.getLocationSkin(), group);
+            if (brows == null) {
+                continue;
+            }
+            this.bindTexture(brows);
+            GL11.glPushMatrix();
+            model.bipedBody.postRender(MODEL_SCALE);
+            model.bipedHead.postRender(MODEL_SCALE);
+            float idle = (float)Math.sin((player.ticksExisted + group * 17) / (20.0 + group * 3.0)) * 0.04f;
+            GL11.glTranslatef(0.0f, idle, -0.002f);
+            this.eyebrowOverlay.render(MODEL_SCALE);
+            GL11.glPopMatrix();
+        }
     }
 
     @Override

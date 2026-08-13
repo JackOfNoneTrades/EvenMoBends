@@ -24,6 +24,21 @@ Maintainable Minecraft 1.7.10 fork of Mo' Bends 0.20.1 with Wawel Auth and Smart
 | GTNH Et Futurum Requiem + Even Mo' Bends | Mo' Bends with an EFR-aware Elytra flight pose | Enabled |
 | Smart Moving (with or without WawelAuth) | Smart Moving / Smart Render; Mo' Bends player features disabled | Enabled |
 
+## Blinking
+
+Player skins can opt in to blinking with the embedded blink marker and frames documented by ETF's
+[player skin guide](https://github.com/Traben-0/Entity_Texture_Features/blob/ETF-Main/.github/README-assets/SKIN_GUIDE.md#blinking---v230).
+Even Mo' Bends implements only the blinking part of that convention. Sleeping and blindness keep the eyes closed.
+By default, intermediate eyelid frames are generated and eased closed and open for a smoother, Fresh Moves-style
+blink without adding a second player body rig. Set `blinking.smoothEyelids=false` to use the authored frames directly.
+
+Pigs blink; spiders and zombie-family mobs deliberately do not. A resource pack can override a pig's generated
+closed-eye texture by placing `_blink` before `.png`, with an optional `_blink2.png` half-closed frame. When Angelica
+Random Mobs is enabled, these companions are resolved after the pig variant, so `pig2.png` can use `pig2_blink.png`.
+
+Player blinking, smooth eyelids, pig blinking, blink frequency, and blink length are independently configurable in
+`mobends.cfg`.
+
 ## Building
 
 ```sh
@@ -47,6 +62,7 @@ It can additionally load makamys' Smart Moving stack without making it a publish
 * [Iwo Plaza / GobBob](https://www.curseforge.com/minecraft/mc-mods/mo-bends), creator of Mo' Bends.
 * [makamys](https://github.com/makamys/SmartMoving), maintainer of the Minecraft 1.7.10 Smart Moving fork used for compatibility testing.
 * [GTNH Et Futurum Requiem](https://github.com/GTNewHorizons/Et-Futurum-Requiem), whose optional API supplies Elytra flight state.
+* [Entity Texture Features](https://github.com/Traben-0/Entity_Texture_Features), whose documented player-skin blink convention is supported.
 * [GT:NH buildscript](https://github.com/GTNewHorizons/ExampleMod1.7.10).
 
 See [UPSTREAM.md](UPSTREAM.md) for exact source and binary provenance.
