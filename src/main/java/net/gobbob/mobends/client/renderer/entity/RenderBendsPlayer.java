@@ -46,6 +46,7 @@ extends RenderPlayer {
     private static final float MODEL_SCALE = 0.0625f;
     public int refreshModel = 0;
     private final ModelRenderer eyebrowOverlay;
+    private final ModelBiped wawelFirstPersonModel = new ModelBiped();
 
     public RenderBendsPlayer() {
         this.mainModel = new ModelBendsPlayer(0.0f);
@@ -141,24 +142,13 @@ extends RenderPlayer {
         GL11.glColor3f((float)f, (float)f, (float)f);
 
         if (p_82441_1_ instanceof AbstractClientPlayer && WawelAuthCompat.isModernSkinSupportEnabled()) {
-            ModelBendsPlayer model = (ModelBendsPlayer)this.modelBipedMain;
-            model.initModern();
-            model.setSlim(WawelAuthCompat.isSlim((AbstractClientPlayer)p_82441_1_));
-            ModelRenderer rightArmWear = model.getRightArmWear();
-            boolean wearVisible = rightArmWear.showModel;
-            boolean showSleeve = !WawelAuthCompat.isRightSleeveHidden(p_82441_1_);
-            boolean render3DSleeve = showSleeve
-                && model.prepare3DRightArmWear((AbstractClientPlayer)p_82441_1_);
-            rightArmWear.showModel = showSleeve && !render3DSleeve;
-            model.onGround = 0.0f;
-            model.setRotationAngles(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0625f, p_82441_1_);
-            model.prepareModernOverlays();
-            model.bipedRightArm.render(0.0625f);
-            if (render3DSleeve) {
-                model.render3DRightArmWear(0.0625f);
+            ModelBiped previousModel = this.modelBipedMain;
+            this.modelBipedMain = this.wawelFirstPersonModel;
+            try {
+                super.renderFirstPersonArm(p_82441_1_);
+            } finally {
+                this.modelBipedMain = previousModel;
             }
-            rightArmWear.showModel = wearVisible;
-            model.prepareModernOverlays();
             return;
         }
 
