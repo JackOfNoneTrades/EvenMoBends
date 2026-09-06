@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.animation.Animation;
+import net.gobbob.mobends.animation.player.Animation_Rowing;
 import net.gobbob.mobends.client.model.ModelBoxBends;
 import net.gobbob.mobends.client.model.ModelRendererBends;
 import net.gobbob.mobends.client.model.ModelRendererBends_SeperatedChild;
@@ -11,6 +12,7 @@ import net.gobbob.mobends.client.renderer.SwordTrail;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
+import net.gobbob.mobends.compat.EtFuturumRequiemCompat.BoatState;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.data.Data_Player;
 import net.gobbob.mobends.pack.BendsPack;
@@ -49,6 +51,7 @@ extends ModelBiped {
     public float armSwingAmount;
     private final float modelScale;
     private final float modelYOffset;
+    private float partialTicks;
 
     private boolean modern;
     private boolean slim;
@@ -244,6 +247,16 @@ extends ModelBiped {
     }
 
     @Override
+    public void setLivingAnimations(EntityLivingBase entity, float swing, float amount, float partialTicks) {
+        super.setLivingAnimations(entity, swing, amount, partialTicks);
+        this.partialTicks = partialTicks;
+    }
+
+    public float getPartialTicks() {
+        return this.partialTicks;
+    }
+
+    @Override
     public void setRotationAngles(float argSwingTime, float argSwingAmount, float argArmSway, float argHeadY, float argHeadX, float argNr6, Entity argEntity) {
         if (Minecraft.getMinecraft().theWorld == null) {
             return;
@@ -291,11 +304,16 @@ extends ModelBiped {
             ((ModelRendererBends)this.bipedLeftForeLeg).resetScale();
             BendsVar.tempData = Data_Player.get(argEntity.getEntityId());
             EntityPlayer player = (EntityPlayer)argEntity;
+            BoatState boat = Animation_Rowing.getBoatState(player, this.partialTicks);
+            boolean rowing = false;
             boolean elytraFlying = EtFuturumRequiemCompat.isElytraFlying(player);
             boolean creativeFlying = player.capabilities.isFlying && !data.isOnGround();
             boolean touchingWater = this.isTouchingWater(argEntity);
             boolean groundedInWater = touchingWater && data.isOnGround();
-            if ((elytraFlying || creativeFlying) && this.animatePlayer("flying", argEntity, data)) {
+            if (boat != null) {
+                rowing = this.animatePlayer("rowing", argEntity, data);
+                if (!rowing) this.animatePlayer("riding", argEntity, data);
+            } else if ((elytraFlying || creativeFlying) && this.animatePlayer("flying", argEntity, data)) {
                 // Flight takes precedence over the ordinary airborne animations.
             } else if (argEntity.isRiding()) {
                 this.animatePlayer("riding", argEntity, data);
@@ -323,7 +341,9 @@ extends ModelBiped {
                     this.animatePlayer("sneak", argEntity, data);
                 }
             }
-            if (this.aimedBow) {
+            if (rowing && boat.driver) {
+                // Both hands are occupied by paddles, even while coasting or holding a tool.
+            } else if (this.aimedBow) {
                 this.animatePlayer("bow", argEntity, data);
             } else if (((EntityPlayer)argEntity).getCurrentEquippedItem() != null && ((EntityPlayer)argEntity).getCurrentEquippedItem().getItem() instanceof ItemPickaxe || ((EntityPlayer)argEntity).getCurrentEquippedItem() != null && Block.getBlockFromItem(((EntityPlayer)argEntity).getCurrentEquippedItem().getItem()) != Blocks.air) {
                 this.animatePlayer("mining", argEntity, data);
@@ -515,6 +535,10 @@ extends ModelBiped {
 
     public boolean isModern() {
         return this.modern;
+    }
+
+    public boolean isSlim() {
+        return this.slim;
     }
 
     public void render3DRightArmWear(float scale) {

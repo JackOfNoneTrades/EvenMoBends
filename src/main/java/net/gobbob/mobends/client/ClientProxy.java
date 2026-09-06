@@ -9,6 +9,7 @@ import net.gobbob.mobends.CommonProxy;
 import net.gobbob.mobends.client.render.BlinkingTextures;
 import net.gobbob.mobends.client.renderer.entity.RenderBlinkingPig;
 import net.gobbob.mobends.compat.CompatibilityPolicy;
+import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.config.BlinkConfig;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.event.EventHandler_DataUpdate;
@@ -51,6 +52,7 @@ extends CommonProxy {
         // EFR installs its Technoblade pig renderer during init. Register after it so blinking remains active,
         // while retaining EFR's crown render pass when that mod is present.
         RenderingRegistry.registerEntityRenderingHandler(EntityPig.class, createPigRenderer());
+        EtFuturumRequiemCompat.registerBoatRenderers();
     }
 
     private static Render createPigRenderer() {

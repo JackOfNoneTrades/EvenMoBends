@@ -23,6 +23,9 @@ extends Animation {
         Data_Player data = (Data_Player)argData;
         EntityPlayer player = (EntityPlayer)argEntity;
         model.renderOffset.setSmoothY(1.5f, 0.3f);
+        // Restore ordinary riding when switching mounts or disabling the rowing pose.
+        ((ModelRendererBends)model.bipedRightArm).rotation.setSmoothZ(0.0f, 0.3f);
+        ((ModelRendererBends)model.bipedLeftArm).rotation.setSmoothZ(0.0f, 0.3f);
         ((ModelRendererBends)model.bipedBody).rotation.setSmoothY(0.0f, 0.3f);
         ((ModelRendererBends)model.bipedBody).rotation.setSmoothZ(0.0f, 0.3f);
         ((ModelRendererBends)model.bipedRightLeg).rotation.setSmoothX(-85.0f, 0.3f);
@@ -58,4 +61,3 @@ extends Animation {
         ((ModelRendererBends)model.bipedHead).rotation.setSmoothX(model.headRotationX - model.bipedBody.rotateAngleX / (float)Math.PI * 180.0f, 0.3f);
     }
 }
-

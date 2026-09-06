@@ -3,9 +3,11 @@ package net.gobbob.mobends.client.renderer.entity;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 import net.gobbob.mobends.MoBends;
+import net.gobbob.mobends.animation.player.Animation_Rowing;
 import net.gobbob.mobends.client.model.entity.ModelBendsPlayer;
 import net.gobbob.mobends.client.render.BlinkingTextures;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
+import net.gobbob.mobends.compat.EtFuturumRequiemCompat.BoatState;
 import net.gobbob.mobends.compat.WawelAuthCompat;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.customarmor.CustomArmor;
@@ -217,6 +219,14 @@ extends RenderPlayer {
             GL11.glRotatef((float)this.getDeathMaxRotation(argPlayer), (float)0.0f, (float)0.0f, (float)1.0f);
             GL11.glRotatef((float)270.0f, (float)0.0f, (float)1.0f, (float)0.0f);
         } else {
+            BoatState boat = Animation_Rowing.getBoatState(argPlayer, p_77043_4_);
+            if (boat != null) {
+                // Keep the seated body facing the boat even with EFR's yaw lock disabled.
+                // Do not apply last frame's global swimming/riding offsets to this pose.
+                super.rotateCorpse(argPlayer, p_77043_2_, Animation_Rowing.boatYaw(boat, p_77043_4_), p_77043_4_);
+                GL11.glTranslatef(0.0f, Animation_Rowing.seatLift(boat.raft), 0.0f);
+                return;
+            }
             super.rotateCorpse(argPlayer, p_77043_2_, p_77043_3_, p_77043_4_);
             ((ModelBendsPlayer)this.modelBipedMain).updateWithEntityData(argPlayer);
             ((ModelBendsPlayer)this.modelBipedMain).postRender(0.0625f);

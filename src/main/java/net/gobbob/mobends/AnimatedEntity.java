@@ -14,6 +14,7 @@ import net.gobbob.mobends.animation.player.Animation_Flying;
 import net.gobbob.mobends.animation.player.Animation_Jump;
 import net.gobbob.mobends.animation.player.Animation_Mining;
 import net.gobbob.mobends.animation.player.Animation_Riding;
+import net.gobbob.mobends.animation.player.Animation_Rowing;
 import net.gobbob.mobends.animation.player.Animation_Sneak;
 import net.gobbob.mobends.animation.player.Animation_Sprint;
 import net.gobbob.mobends.animation.player.Animation_Swimming;
@@ -79,6 +80,7 @@ public class AnimatedEntity {
                         .add(new Animation_Swimming())
                         .add(new Animation_Bow())
                         .add(new Animation_Riding())
+                        .add(new Animation_Rowing())
                         .add(new Animation_Mining())
                         .add(new Animation_Axe()));
         }

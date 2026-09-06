@@ -18,6 +18,7 @@ public final class PlayerAnimationConfig {
     private static boolean diving = true;
     private static boolean bow = true;
     private static boolean riding = true;
+    private static boolean rowing = true;
     private static boolean mining = true;
     private static boolean axe = true;
     private static boolean attack = true;
@@ -43,6 +44,7 @@ public final class PlayerAnimationConfig {
         diving = read(config, "diving", "Directional animation used while moving fully underwater.");
         bow = read(config, "bow", "Bow aiming pose.");
         riding = read(config, "riding", "Mounted player pose.");
+        rowing = read(config, "rowing", "Et Futurum Requiem paddle-synchronized boating pose. Requires riding; falls back to riding when disabled.");
         mining = read(config, "mining", "Pickaxe and block-mining pose.");
         axe = read(config, "axe", "Axe swing pose.");
         attack = read(config, "attack", "Master switch for sword and unarmed attack animations.");
@@ -67,6 +69,7 @@ public final class PlayerAnimationConfig {
         write(config, "diving", diving);
         write(config, "bow", bow);
         write(config, "riding", riding);
+        write(config, "rowing", rowing);
         write(config, "mining", mining);
         write(config, "axe", axe);
         write(config, "attack", attack);
@@ -91,6 +94,7 @@ public final class PlayerAnimationConfig {
         if ("diving".equals(animation)) return diving;
         if ("bow".equals(animation)) return bow;
         if ("riding".equals(animation)) return riding;
+        if ("rowing".equals(animation)) return rowing;
         if ("mining".equals(animation)) return mining;
         if ("axe".equals(animation)) return axe;
         if ("attack".equals(animation)) return attack;

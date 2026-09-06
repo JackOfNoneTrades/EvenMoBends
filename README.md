@@ -21,8 +21,13 @@ Maintainable Minecraft 1.7.10 fork of Mo' Bends 0.20.1 with Wawel Auth and Smart
 | --- | --- | --- |
 | Even Mo' Bends only | Mo' Bends | Enabled |
 | WawelAuth + Even Mo' Bends | Mo' Bends with WawelAuth skins and modern-skin support | Enabled |
-| GTNH Et Futurum Requiem + Even Mo' Bends | Mo' Bends with an EFR-aware Elytra flight pose | Enabled |
+| GTNH Et Futurum Requiem + Even Mo' Bends | Mo' Bends with EFR-aware Elytra flight and rowing poses | Enabled |
 | Smart Moving (with or without WawelAuth) | Smart Moving / Smart Render; Mo' Bends player features disabled | Enabled |
+
+EFR boat drivers follow each paddle independently, including turns and coasting. Boats, chest boats,
+and rafts use their own handle and seat positions; rear passengers sit without rowing.
+The paddles settle into an advanced resting position for a more relaxed arm pose, with eased starts and stops.
+Set `animations.player.rowing=false` in `mobends.cfg` to use the ordinary riding pose instead.
 
 ## Blinking
 
@@ -57,7 +62,7 @@ It can additionally load makamys' Smart Moving stack without making it a publish
 
 * [Iwo Plaza / GobBob](https://www.curseforge.com/minecraft/mc-mods/mo-bends), creator of Mo' Bends.
 * [makamys](https://github.com/makamys/SmartMoving), maintainer of the Minecraft 1.7.10 Smart Moving fork used for compatibility testing.
-* [GTNH Et Futurum Requiem](https://github.com/GTNewHorizons/Et-Futurum-Requiem), whose optional API supplies Elytra flight state.
+* [GTNH Et Futurum Requiem](https://github.com/GTNewHorizons/Et-Futurum-Requiem), whose optional API supplies Elytra flight and boat paddle state.
 * [Entity Texture Features](https://github.com/Traben-0/Entity_Texture_Features), whose documented player-skin blink convention is supported.
 * [GT:NH buildscript](https://github.com/GTNewHorizons/ExampleMod1.7.10).
 
