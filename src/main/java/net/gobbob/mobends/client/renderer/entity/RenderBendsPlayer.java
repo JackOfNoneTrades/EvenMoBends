@@ -49,7 +49,7 @@ extends RenderPlayer {
     private final ModelBiped wawelFirstPersonModel = new ModelBiped();
 
     public RenderBendsPlayer() {
-        this.mainModel = new ModelBendsPlayer(0.0f);
+        this.mainModel = WawelAuthCompat.createPlayerModel(0.0f);
         this.modelBipedMain = (ModelBendsPlayer)this.mainModel;
         this.modelArmorChestplate = new ModelBendsPlayer(1.0f);
         this.modelArmor = new ModelBendsPlayer(0.5f);
@@ -188,7 +188,7 @@ extends RenderPlayer {
     @Override
     public void doRender(AbstractClientPlayer p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_) {
         if (this.refreshModel != MoBends.refreshModel) {
-            this.mainModel = new ModelBendsPlayer(0.0f);
+            this.mainModel = WawelAuthCompat.createPlayerModel(0.0f);
             this.modelBipedMain = (ModelBendsPlayer)this.mainModel;
             this.modelArmorChestplate = new ModelBendsPlayer(1.0f);
             this.modelArmor = new ModelBendsPlayer(0.5f);

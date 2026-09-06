@@ -5,6 +5,7 @@ plugins {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
+    testRuntimeOnly("org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209")
 }
 
 tasks.test {
