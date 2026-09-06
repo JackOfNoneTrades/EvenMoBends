@@ -429,6 +429,21 @@ extends ModelBiped {
     }
 
     /**
+     * Overrides SimpleSkinBackport's duck method once its ModelBiped mixin is applied.
+     * Its generic box conversion loses our segmented geometry, UVs and hidden joint faces.
+     * Keep these signatures free of optional API types so the model also loads without SSB.
+     */
+    public void ssb$set64x() {
+        this.initModern();
+    }
+
+    public void ssb$setSlim(boolean slim) {
+        // Models recreated by the settings GUI miss SSB's startup-only texture conversion.
+        this.initModern();
+        this.setSlim(slim);
+    }
+
+    /**
      * Overrides WawelAuth's interface method after its ModelBiped mixin is applied.
      * The segmented Mo' Bends hierarchy is retained instead of being replaced with vanilla limbs.
      */

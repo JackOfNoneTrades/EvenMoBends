@@ -8,6 +8,7 @@ import net.gobbob.mobends.client.model.entity.ModelBendsPlayer;
 import net.gobbob.mobends.client.render.BlinkingTextures;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat.BoatState;
+import net.gobbob.mobends.compat.SimpleSkinBackportCompat;
 import net.gobbob.mobends.compat.WawelAuthCompat;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.customarmor.CustomArmor;
@@ -49,6 +50,7 @@ extends RenderPlayer {
     public int refreshModel = 0;
     private final ModelRenderer eyebrowOverlay;
     private final ModelBiped wawelFirstPersonModel = new ModelBiped();
+    private final ModelBiped ssbFirstPersonModel = new ModelBiped();
 
     public RenderBendsPlayer() {
         this.mainModel = WawelAuthCompat.createPlayerModel(0.0f);
@@ -154,7 +156,10 @@ extends RenderPlayer {
             return;
         }
 
-        ModelBiped model = new ModelBiped();
+        // SSB's hand event updates modelBipedMain, not the straight arm drawn here.
+        // Use its converter only on a vanilla model, never on ModelRendererBends boxes.
+        ModelBiped model = SimpleSkinBackportCompat.prepareFirstPersonModel(this.ssbFirstPersonModel, p_82441_1_)
+            ? this.ssbFirstPersonModel : new ModelBiped();
         model.onGround = 0.0f;
         model.setRotationAngles(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0625f, p_82441_1_);
         model.bipedRightArm.render(0.0625f);
