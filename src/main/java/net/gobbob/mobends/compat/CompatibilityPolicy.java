@@ -9,6 +9,7 @@ public final class CompatibilityPolicy {
     private static final boolean SMART_RENDER_LOADED = Loader.isModLoaded("SmartRender");
     private static final boolean WAWEL_AUTH_LOADED = Loader.isModLoaded("wawelauth");
     private static final boolean SIMPLE_SKIN_BACKPORT_LOADED = Loader.isModLoaded("simpleskinbackport");
+    private static final boolean JUST_A_SHIELD_LOADED = Loader.isModLoaded("targaseule");
     private static final boolean ET_FUTURUM_REQUIEM_LOADED = Loader.isModLoaded("etfuturum");
     private static final boolean MOB_ONLY_MODE = SMART_MOVING_LOADED || SMART_RENDER_LOADED;
 
@@ -30,6 +31,10 @@ public final class CompatibilityPolicy {
 
     public static boolean isSimpleSkinBackportLoaded() {
         return SIMPLE_SKIN_BACKPORT_LOADED;
+    }
+
+    public static boolean isJustAShieldLoaded() {
+        return JUST_A_SHIELD_LOADED;
     }
 
     public static boolean isEtFuturumRequiemLoaded() {

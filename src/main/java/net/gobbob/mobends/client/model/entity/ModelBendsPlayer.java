@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.animation.Animation;
+import net.gobbob.mobends.animation.player.Animation_Blocking;
 import net.gobbob.mobends.animation.player.Animation_Rowing;
 import net.gobbob.mobends.client.model.ModelBoxBends;
 import net.gobbob.mobends.client.model.ModelRendererBends;
@@ -13,6 +14,7 @@ import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat.BoatState;
+import net.gobbob.mobends.compat.PlayerBlockingCompat;
 import net.gobbob.mobends.config.PlayerAnimationConfig;
 import net.gobbob.mobends.data.Data_Player;
 import net.gobbob.mobends.pack.BendsPack;
@@ -341,8 +343,11 @@ extends ModelBiped {
                     this.animatePlayer("sneak", argEntity, data);
                 }
             }
+            int blockingHands = PlayerBlockingCompat.getBlockingHands(player, this);
             if (rowing && boat.driver) {
                 // Both hands are occupied by paddles, even while coasting or holding a tool.
+            } else if ((blockingHands & PlayerBlockingCompat.MAIN_HAND) != 0) {
+                // Do not let a recent sword swing/stance compete with main-hand blocking.
             } else if (this.aimedBow) {
                 this.animatePlayer("bow", argEntity, data);
             } else if (((EntityPlayer)argEntity).getCurrentEquippedItem() != null && ((EntityPlayer)argEntity).getCurrentEquippedItem().getItem() instanceof ItemPickaxe || ((EntityPlayer)argEntity).getCurrentEquippedItem() != null && Block.getBlockFromItem(((EntityPlayer)argEntity).getCurrentEquippedItem().getItem()) != Blocks.air) {
@@ -351,6 +356,9 @@ extends ModelBiped {
                 this.animatePlayer("axe", argEntity, data);
             } else {
                 this.animatePlayer("attack", argEntity, data);
+            }
+            if (!(rowing && boat.driver)) {
+                Animation_Blocking.apply(this, blockingHands);
             }
             ((ModelRendererBends)this.bipedHead).update(data.ticksPerFrame);
             ((ModelRendererBends)this.bipedHeadwear).update(data.ticksPerFrame);

@@ -386,7 +386,9 @@ extends RenderPlayer {
                     GL11.glRotatef((float)180.0f, (float)0.0f, (float)0.0f, (float)1.0f);
                     GL11.glTranslatef((float)0.0f, (float)-0.125f, (float)0.0f);
                 }
-                if (argPlayer.getItemInUseCount() > 0 && enumaction == EnumAction.block) {
+                // Backhand may be using the other hand, and Just A Shield may suppress
+                // sword blocking. Respect their final per-hand flag, not just the use timer.
+                if (this.modelBipedMain.heldItemRight == 3 && enumaction == EnumAction.block) {
                     GL11.glTranslatef((float)0.05f, (float)0.0f, (float)-0.1f);
                     GL11.glRotatef((float)-50.0f, (float)0.0f, (float)1.0f, (float)0.0f);
                     GL11.glRotatef((float)-10.0f, (float)1.0f, (float)0.0f, (float)0.0f);

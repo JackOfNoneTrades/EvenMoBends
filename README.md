@@ -22,6 +22,7 @@ Maintainable Minecraft 1.7.10 fork of Mo' Bends 0.20.1 with Wawel Auth and Smart
 | Even Mo' Bends only | Mo' Bends | Enabled |
 | WawelAuth + Even Mo' Bends | Mo' Bends with WawelAuth skins and modern-skin support | Enabled |
 | SimpleSkinBackport + Even Mo' Bends | Mo' Bends with modern skins, slim arms and segmented skin layers | Enabled |
+| Backhand + Just A Shield + Even Mo' Bends | Mo' Bends with per-hand blocking poses, including passive shield blocking | Enabled |
 | GTNH Et Futurum Requiem + Even Mo' Bends | Mo' Bends with EFR-aware Elytra flight and rowing poses | Enabled |
 | Smart Moving (with or without WawelAuth) | Smart Moving / Smart Render; Mo' Bends player features disabled | Enabled |
 
@@ -66,6 +67,14 @@ To test SimpleSkinBackport instead of Wawel Auth, supply an SSB development jar:
 ```
 
 Wawel Auth remains available for compilation and tests, but is excluded from this client's runtime.
+
+To test Backhand and Just A Shield, supply a Just A Shield development jar (Backhand is added automatically):
+
+```sh
+./gradlew -PjustAShieldJar=/path/to/targaseule-dev.jar runClient25
+```
+
+Use `-Pbackhand` to test Backhand alone. Either option can be combined with `-PsimpleSkinBackportJar=...`.
 
 ## Credits
 
