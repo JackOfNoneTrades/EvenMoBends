@@ -14,6 +14,7 @@ public final class PlayerAnimationConfig {
     private static boolean falling = true;
     private static boolean flying = true;
     private static boolean climbing = true;
+    private static boolean crawling = true;
     private static boolean swimming = true;
     private static boolean diving = true;
     private static boolean bow = true;
@@ -40,7 +41,8 @@ public final class PlayerAnimationConfig {
         falling = read(config, "falling", "Distinct pose for sustained downward falls.");
         flying = read(config, "flying", "Creative flight and Et Futurum Requiem Elytra flight pose.");
         climbing = read(config, "climbing", "Vanilla ladder and vine climbing pose.");
-        swimming = read(config, "swimming", "Surface and idle swimming animation.");
+        crawling = read(config, "crawling", "Aqua Acrobatics crawling limb cycle. The low pose is retained when disabled.");
+        swimming = read(config, "swimming", "Surface, idle and Aqua Acrobatics swimming animation.");
         diving = read(config, "diving", "Directional animation used while moving fully underwater.");
         bow = read(config, "bow", "Bow aiming pose.");
         riding = read(config, "riding", "Mounted player pose.");
@@ -65,6 +67,7 @@ public final class PlayerAnimationConfig {
         write(config, "falling", falling);
         write(config, "flying", flying);
         write(config, "climbing", climbing);
+        write(config, "crawling", crawling);
         write(config, "swimming", swimming);
         write(config, "diving", diving);
         write(config, "bow", bow);
@@ -90,6 +93,7 @@ public final class PlayerAnimationConfig {
         if ("falling".equals(animation)) return falling;
         if ("flying".equals(animation)) return flying;
         if ("climbing".equals(animation)) return climbing;
+        if ("crawling".equals(animation)) return crawling;
         if ("swimming".equals(animation)) return swimming;
         if ("diving".equals(animation)) return diving;
         if ("bow".equals(animation)) return bow;

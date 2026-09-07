@@ -38,6 +38,14 @@ dependencies {
         devOnlyNonPublishable(files(shieldJar))
     }
 
+    if (project.hasProperty("aquaAcrobaticsJar")) {
+        def aquaJar = file(project.property("aquaAcrobaticsJar"))
+        if (!aquaJar.isFile()) {
+            throw new GradleException("Aqua Acrobatics development jar not found: ${aquaJar}")
+        }
+        devOnlyNonPublishable(files(aquaJar))
+    }
+
     // Opt in when testing the Smart Moving policy; its presence intentionally disables player bends.
     if (project.hasProperty("smartMoving")) {
         devOnlyNonPublishable(rfg.deobf("net.smart:SmartMoving:1.7.10-15.8.2-maka"))

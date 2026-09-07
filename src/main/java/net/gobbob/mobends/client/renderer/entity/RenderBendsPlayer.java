@@ -6,6 +6,7 @@ import net.gobbob.mobends.MoBends;
 import net.gobbob.mobends.animation.player.Animation_Rowing;
 import net.gobbob.mobends.client.model.entity.ModelBendsPlayer;
 import net.gobbob.mobends.client.render.BlinkingTextures;
+import net.gobbob.mobends.compat.AquaAcrobaticsCompat;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat.BoatState;
 import net.gobbob.mobends.compat.SimpleSkinBackportCompat;
@@ -233,6 +234,12 @@ extends RenderPlayer {
                 return;
             }
             super.rotateCorpse(argPlayer, p_77043_2_, p_77043_3_, p_77043_4_);
+            if (AquaAcrobaticsCompat.getState(argPlayer, p_77043_4_).isActive()) {
+                // AA's RenderPlayer mixin has already rotated and positioned the whole player.
+                // Suppress our transform even on entry, before setRotationAngles updates the model,
+                // and through AA's stand-up blend so last frame's pose cannot add a second tilt.
+                return;
+            }
             ((ModelBendsPlayer)this.modelBipedMain).updateWithEntityData(argPlayer);
             ((ModelBendsPlayer)this.modelBipedMain).postRender(0.0625f);
         }

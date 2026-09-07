@@ -21,17 +21,21 @@ extends Animation {
     public void animate(EntityLivingBase argEntity, ModelBase argModel, EntityData argData) {
         ModelBendsPlayer model = (ModelBendsPlayer)argModel;
         Data_Player data = (Data_Player)argData;
-        float armSway = (MathHelper.cos(data.ticks * 0.1625f) + 1.0f) / 2.0f;
-        float armSway2 = (-MathHelper.sin(data.ticks * 0.1625f) + 1.0f) / 2.0f;
-        float legFlap = MathHelper.cos(data.ticks * 0.4625f);
-        float foreArmSway = (float)((double)(data.ticks * 0.1625f) % (Math.PI * 2)) / ((float)Math.PI * 2);
+        apply(model, data.ticks, data.motion.x != 0.0f || data.motion.z != 0.0f);
+    }
+
+    public static void apply(ModelBendsPlayer model, float ticks, boolean moving) {
+        float armSway = (MathHelper.cos(ticks * 0.1625f) + 1.0f) / 2.0f;
+        float armSway2 = (-MathHelper.sin(ticks * 0.1625f) + 1.0f) / 2.0f;
+        float legFlap = MathHelper.cos(ticks * 0.4625f);
+        float foreArmSway = (float)((double)(ticks * 0.1625f) % (Math.PI * 2)) / ((float)Math.PI * 2);
         float foreArmStretch = armSway * 2.0f;
         foreArmStretch -= 1.0f;
         foreArmStretch = GUtil.min(foreArmStretch, 0.0f);
-        if (data.motion.x == 0.0f & data.motion.z == 0.0f) {
-            armSway = (MathHelper.cos(data.ticks * 0.0825f) + 1.0f) / 2.0f;
-            armSway2 = (-MathHelper.sin(data.ticks * 0.0825f) + 1.0f) / 2.0f;
-            legFlap = MathHelper.cos(data.ticks * 0.2625f);
+        if (!moving) {
+            armSway = (MathHelper.cos(ticks * 0.0825f) + 1.0f) / 2.0f;
+            armSway2 = (-MathHelper.sin(ticks * 0.0825f) + 1.0f) / 2.0f;
+            legFlap = MathHelper.cos(ticks * 0.2625f);
             ((ModelRendererBends)model.bipedHead).pre_rotation.setSmoothX(0.0f, 0.3f);
             ((ModelRendererBends)model.bipedLeftArm).rotation.setSmoothX(armSway2 * 30.0f - 15.0f, 0.3f);
             ((ModelRendererBends)model.bipedRightArm).rotation.setSmoothX(armSway2 * 30.0f - 15.0f, 0.3f);
@@ -69,4 +73,3 @@ extends Animation {
         }
     }
 }
-

@@ -23,6 +23,7 @@ Maintainable Minecraft 1.7.10 fork of Mo' Bends 0.20.1 with Wawel Auth and Smart
 | WawelAuth + Even Mo' Bends | Mo' Bends with WawelAuth skins and modern-skin support | Enabled |
 | SimpleSkinBackport + Even Mo' Bends | Mo' Bends with modern skins, slim arms and segmented skin layers | Enabled |
 | Backhand + Just A Shield + Even Mo' Bends | Mo' Bends with per-hand blocking poses, including passive shield blocking | Enabled |
+| Aqua Acrobatics + Even Mo' Bends | Mo' Bends limbs with AA's swimming/crawling poses and whole-body transforms | Enabled |
 | GTNH Et Futurum Requiem + Even Mo' Bends | Mo' Bends with EFR-aware Elytra flight and rowing poses | Enabled |
 | Smart Moving (with or without WawelAuth) | Smart Moving / Smart Render; Mo' Bends player features disabled | Enabled |
 
@@ -30,6 +31,11 @@ EFR boat drivers follow each paddle independently, including turns and coasting.
 and rafts use their own handle and seat positions; rear passengers sit without rowing.
 The paddles settle into an advanced resting position for a more relaxed arm pose, with eased starts and stops.
 Set `animations.player.rowing=false` in `mobends.cfg` to use the ordinary riding pose instead.
+
+Aqua Acrobatics supplies the swimming/crawling state and body rotation; Mo' Bends animates the segmented limbs.
+Stopping or touching the bottom keeps AA's prone pose, and ordinary movement in water uses upright treading.
+Set `animations.player.crawling=false` to disable the crawl limb cycle while keeping the low pose needed to fit.
+The `swimming` animation switch also controls AA's swimming limb cycle.
 
 ## Blinking
 
@@ -75,6 +81,12 @@ To test Backhand and Just A Shield, supply a Just A Shield development jar (Back
 ```
 
 Use `-Pbackhand` to test Backhand alone. Either option can be combined with `-PsimpleSkinBackportJar=...`.
+
+To test Aqua Acrobatics, supply its development jar. This can be combined with the options above:
+
+```sh
+./gradlew -PaquaAcrobaticsJar=/path/to/aquaacrobatics-dev.jar runClient25
+```
 
 ## Credits
 

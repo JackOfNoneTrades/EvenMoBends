@@ -4,12 +4,15 @@ import java.util.UUID;
 
 import net.gobbob.mobends.AnimatedEntity;
 import net.gobbob.mobends.animation.Animation;
+import net.gobbob.mobends.animation.player.Animation_AquaAcrobatics;
 import net.gobbob.mobends.animation.player.Animation_Blocking;
 import net.gobbob.mobends.animation.player.Animation_Rowing;
+import net.gobbob.mobends.animation.player.Animation_Swimming;
 import net.gobbob.mobends.client.model.ModelBoxBends;
 import net.gobbob.mobends.client.model.ModelRendererBends;
 import net.gobbob.mobends.client.model.ModelRendererBends_SeperatedChild;
 import net.gobbob.mobends.client.renderer.SwordTrail;
+import net.gobbob.mobends.compat.AquaAcrobaticsCompat;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
 import net.gobbob.mobends.compat.EtFuturumRequiemCompat;
@@ -306,6 +309,7 @@ extends ModelBiped {
             ((ModelRendererBends)this.bipedLeftForeLeg).resetScale();
             BendsVar.tempData = Data_Player.get(argEntity.getEntityId());
             EntityPlayer player = (EntityPlayer)argEntity;
+            AquaAcrobaticsCompat.State aqua = AquaAcrobaticsCompat.getState(player, this.partialTicks);
             BoatState boat = Animation_Rowing.getBoatState(player, this.partialTicks);
             boolean rowing = false;
             boolean elytraFlying = EtFuturumRequiemCompat.isElytraFlying(player);
@@ -319,8 +323,15 @@ extends ModelBiped {
                 // Flight takes precedence over the ordinary airborne animations.
             } else if (argEntity.isRiding()) {
                 this.animatePlayer("riding", argEntity, data);
+            } else if (aqua.isActive()) {
+                // AA owns the pose, including crawling on dry land and swimming along the bottom.
+                Animation_AquaAcrobatics.apply(this, aqua.blend, aqua.inWater, argSwingTime, argSwingAmount,
+                    PlayerAnimationConfig.isEnabled(aqua.inWater ? "swimming" : "crawling"));
             } else if (touchingWater && !groundedInWater) {
-                if (!this.shouldAnimateDiving(argEntity, data) || !this.animatePlayer("diving", argEntity, data)) {
+                if (aqua.available) {
+                    // With AA, being in water alone does not mean the player is swimming horizontally.
+                    if (PlayerAnimationConfig.isEnabled("swimming")) Animation_Swimming.apply(this, data.ticks, false);
+                } else if (!this.shouldAnimateDiving(argEntity, data) || !this.animatePlayer("diving", argEntity, data)) {
                     this.animatePlayer("swimming", argEntity, data);
                 }
             } else if (player.isOnLadder() && this.animatePlayer("climbing", argEntity, data)) {
@@ -348,6 +359,8 @@ extends ModelBiped {
                 // Both hands are occupied by paddles, even while coasting or holding a tool.
             } else if ((blockingHands & PlayerBlockingCompat.MAIN_HAND) != 0) {
                 // Do not let a recent sword swing/stance compete with main-hand blocking.
+            } else if (aqua.isActive() && !player.isSwingInProgress && player.getItemInUseCount() == 0) {
+                // Keep weapon recovery stances from replacing the swimming/crawling arm cycle.
             } else if (this.aimedBow) {
                 this.animatePlayer("bow", argEntity, data);
             } else if (((EntityPlayer)argEntity).getCurrentEquippedItem() != null && ((EntityPlayer)argEntity).getCurrentEquippedItem().getItem() instanceof ItemPickaxe || ((EntityPlayer)argEntity).getCurrentEquippedItem() != null && Block.getBlockFromItem(((EntityPlayer)argEntity).getCurrentEquippedItem().getItem()) != Blocks.air) {
