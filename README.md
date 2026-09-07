@@ -5,13 +5,13 @@ Maintainable Minecraft 1.7.10 fork of Mo' Bends 0.20.1 with Wawel Auth and Smart
 <!-- ![logo](images/logo.png) -->
 
 [![hub](images/badges/github.png)](https://github.com/JackOfNoneTrades/EvenMoBends/releases)
+[![67](images/badges/67.png)](https://67.fentanylsolutions.org/mod/even-mo-bends)
 ![forge](images/badges/forge.png)
 [![cord](images/badges/cord.png)](https://discord.gg/xAWCqGrguG)
 
 <!--
 [![curse](images/badges/curse.png)](https://www.curseforge.com/minecraft/mc-mods/even-mo-bends)
 [![modrinth](images/badges/modrinth.png)](https://modrinth.com/mod/even-mo-bends)
-[![67](images/badges/67.png)](https://67.fentanylsolutions.org/mod/even-mo-bends)
 [![maven](images/badges/maven.png)](https://maven.fentanylsolutions.org/#/releases/net/gobbob/mobends/EvenMoBends)
 -->
 
