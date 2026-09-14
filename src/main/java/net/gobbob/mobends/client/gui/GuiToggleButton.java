@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
 
 public class GuiToggleButton
@@ -17,7 +18,7 @@ extends GuiButton {
         this.toggleState = state;
         this.width = 40;
         this.height = 20;
-        this.displayString = state ? "ON" : "OFF";
+        this.displayString = state ? I18n.format("mobends.gui.on") : I18n.format("mobends.gui.off");
     }
 
     public GuiToggleButton setTitle(String argTitle, int argWidth) {

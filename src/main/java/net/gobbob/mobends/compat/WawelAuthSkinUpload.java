@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 
 /** Reflection bridge to Wawel Auth's existing active-account skin upload functions. */
 public final class WawelAuthSkinUpload {
@@ -45,7 +46,7 @@ public final class WawelAuthSkinUpload {
 
     public static void upload(Account account, BufferedImage image, boolean slim, Completion completion) {
         if (account == null || image == null) {
-            completion.finished(null, "No active Wawel Auth account or generated skin is available.");
+            completion.finished(null, I18n.format("mobends.upload.unavailable"));
             return;
         }
         File file = null;
@@ -55,14 +56,14 @@ public final class WawelAuthSkinUpload {
             file = persistent ? offlineSkinFile(account) : File.createTempFile("evenmobends-skin-", ".png");
             File parent = file.getParentFile();
             if (parent != null && !parent.exists() && !parent.mkdirs()) {
-                throw new IllegalStateException("Could not create " + parent.getAbsolutePath());
+                throw new IllegalStateException(I18n.format("mobends.upload.createFailed", parent.getAbsolutePath()));
             }
             if (!ImageIO.write(image, "png", file)) {
-                throw new IllegalStateException("No PNG writer is available.");
+                throw new IllegalStateException(I18n.format("mobends.upload.noPngWriter"));
             }
 
             Object client = client();
-            if (client == null) throw new IllegalStateException("Wawel Auth client is not running.");
+            if (client == null) throw new IllegalStateException(I18n.format("mobends.upload.clientNotRunning"));
             Object manager = client.getClass().getMethod("getAccountManager").invoke(client);
             Class<?> textureType = Class.forName(TEXTURE_TYPE_CLASS);
             @SuppressWarnings({"rawtypes", "unchecked"})
@@ -71,7 +72,7 @@ public final class WawelAuthSkinUpload {
                 .getMethod("uploadTexture", long.class, textureType, File.class, boolean.class);
             Object result = upload.invoke(manager, account.id, skin, file, slim);
             if (!(result instanceof CompletableFuture)) {
-                throw new IllegalStateException("Wawel Auth returned an unsupported upload result.");
+                throw new IllegalStateException(I18n.format("mobends.upload.unsupportedResult"));
             }
             final File uploadedFile = file;
             final boolean keepFile = persistent;
@@ -81,7 +82,7 @@ public final class WawelAuthSkinUpload {
                 Minecraft.getMinecraft().func_152344_a(() -> {
                     if (cause == null) {
                         invalidate(client, account.uuid);
-                        completion.finished(message == null ? "Uploaded skin." : String.valueOf(message), null);
+                        completion.finished(message == null ? I18n.format("mobends.upload.completed") : String.valueOf(message), null);
                     } else {
                         completion.finished(null, usefulMessage(cause));
                     }
@@ -145,7 +146,7 @@ public final class WawelAuthSkinUpload {
     }
 
     private static String usefulMessage(Throwable error) {
-        if (error == null) return "Unknown upload error.";
+        if (error == null) return I18n.format("mobends.upload.unknownError");
         String message = error.getMessage();
         return message == null || message.trim().isEmpty() ? error.getClass().getSimpleName() : message;
     }

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 
 /** Pixel editor that exports ETF-compatible blinking metadata into the current skin. */
@@ -47,7 +48,8 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     private final int[][] eyebrowColors = new int[8][8];
     private BufferedImage skin;
     private GuiTextField hexField;
-    private String status = "Mark the complete eye region, then mark which pixels are pupils.";
+    private boolean statusSuccess;
+    private String status = I18n.format("mobends.blink.instructions");
     private Tool tool = Tool.EYE_REGION;
     private boolean eyedropperArmed;
     private boolean draggingCanvas;
@@ -78,19 +80,19 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         int y = controlsY();
         this.buttonList.add(new GuiButton(12, x, y, 24, 20, "<"));
         this.buttonList.add(new GuiButton(13, x + 158, y, 24, 20, ">"));
-        this.buttonList.add(new GuiButton(9, x, y + 24, 88, 20, "Left eye"));
-        this.buttonList.add(new GuiButton(10, x + 94, y + 24, 88, 20, "Right eye"));
-        this.buttonList.add(new GuiButton(3, x, y + 119, 182, 20, "Pick color from skin"));
-        this.buttonList.add(new GuiButton(4, x, this.height - 50, 88, 20, "Blink"));
-        this.buttonList.add(new GuiButton(5, x + 94, this.height - 50, 88, 20, "Clear all"));
+        this.buttonList.add(new GuiButton(9, x, y + 24, 88, 20, I18n.format("mobends.blink.leftEye")));
+        this.buttonList.add(new GuiButton(10, x + 94, y + 24, 88, 20, I18n.format("mobends.blink.rightEye")));
+        this.buttonList.add(new GuiButton(3, x, y + 119, 182, 20, I18n.format("mobends.blink.pickColor")));
+        this.buttonList.add(new GuiButton(4, x, this.height - 50, 88, 20, I18n.format("mobends.blink.blink")));
+        this.buttonList.add(new GuiButton(5, x + 94, this.height - 50, 88, 20, I18n.format("mobends.blink.clear")));
         int bottomY = this.height - 28;
         int bottomX = this.width / 2 - 116;
         GuiButton upload = new GuiWawelAuthIconButton(14, bottomX, bottomY);
         upload.visible = WawelAuthCompat.isLoaded();
         upload.enabled = this.skin != null && hasSelection() && !this.uploading;
         this.buttonList.add(upload);
-        this.buttonList.add(new GuiButton(7, bottomX + 24, bottomY, 88, 20, "Back"));
-        GuiButton export = new GuiButton(6, bottomX + 116, bottomY, 116, 20, "Export PNG...");
+        this.buttonList.add(new GuiButton(7, bottomX + 24, bottomY, 88, 20, I18n.format("mobends.gui.back")));
+        GuiButton export = new GuiButton(6, bottomX + 116, bottomY, 116, 20, I18n.format("mobends.blink.export"));
         export.enabled = this.skin != null && hasSelection();
         this.buttonList.add(export);
         this.hexField = new GuiTextField(this.fontRendererObj, x + 42, pickerY() + PICKER_HEIGHT + 4, 78, 18);
@@ -108,8 +110,9 @@ public class GuiBlinkSkinEditor extends GuiScreen {
             setTool(tools[(this.tool.ordinal() + direction + tools.length) % tools.length]);
         } else if (button.id == 9 || button.id == 10) {
             this.activeGroup = button.id == 9 ? 1 : 2;
-            this.status = "Painting the " + (this.activeGroup == 1 ? "left" : "right")
-                + " eyebrow as one coherent overlay.";
+            this.statusSuccess = false;
+            this.status = this.activeGroup == 1 ? I18n.format("mobends.blink.paintingLeft")
+                : I18n.format("mobends.blink.paintingRight");
             updateToolControls();
         } else if (button.id == 3) {
             this.eyedropperArmed = !this.eyedropperArmed;
@@ -118,7 +121,8 @@ public class GuiBlinkSkinEditor extends GuiScreen {
             this.blinkStartedAt = System.currentTimeMillis();
         } else if (button.id == 5) {
             clearSelection();
-            this.status = "Mark the complete eye region, then mark which pixels are pupils.";
+            this.statusSuccess = false;
+            this.status = I18n.format("mobends.blink.instructions");
         } else if (button.id == 6) {
             exportSkin();
         } else if (button.id == 14) {
@@ -237,21 +241,21 @@ public class GuiBlinkSkinEditor extends GuiScreen {
             }
         }
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, "Prepare Blinking Skin", this.width / 2, 12, 0xffffff);
+        this.drawCenteredString(this.fontRendererObj, I18n.format("mobends.blink.title"), this.width / 2, 12, 0xffffff);
         this.drawCenteredString(this.fontRendererObj, stepName(), controlsX() + 91, controlsY() + 6, 0xffffff);
         drawAnimatedFace();
         if (isColorTool()) {
             drawColorPicker();
-            this.drawString(this.fontRendererObj, "Hex:", controlsX(), pickerY() + PICKER_HEIGHT + 9, 0xbfbfbf);
+            this.drawString(this.fontRendererObj, I18n.format("mobends.blink.hex"), controlsX(), pickerY() + PICKER_HEIGHT + 9, 0xbfbfbf);
             this.hexField.drawTextBox();
         }
         this.fontRendererObj.drawSplitString(this.status, canvasX(), canvasY() + 145, 165,
-            this.status.startsWith("Saved") ? 0x55ff55 : 0xbfbfbf);
+            this.statusSuccess ? 0x55ff55 : 0xbfbfbf);
         super.drawScreen(mouseX, mouseY, partialTicks);
         GuiButton upload = getButton(14);
         if (upload != null && upload.visible && mouseX >= upload.xPosition && mouseX < upload.xPosition + upload.width
             && mouseY >= upload.yPosition && mouseY < upload.yPosition + upload.height) {
-            this.func_146283_a(Collections.singletonList("Upload via Wawel Auth"), mouseX, mouseY);
+            this.func_146283_a(Collections.singletonList(I18n.format("mobends.upload.tooltip")), mouseX, mouseY);
         }
     }
 
@@ -342,12 +346,12 @@ public class GuiBlinkSkinEditor extends GuiScreen {
                 canvasY + i * PIXEL_SIZE + 1, 0x44000000);
         }
         String legend = this.tool == Tool.EYE_REGION
-            ? "Colors: inferred connected eye regions"
-            : this.tool == Tool.PUPILS ? "Blue: moving pupils"
-                : this.tool == Tool.PUPIL_BACKGROUND ? "Pink: paintable pupil backgrounds"
+            ? I18n.format("mobends.blink.legend.regions")
+            : this.tool == Tool.PUPILS ? I18n.format("mobends.blink.legend.pupils")
+                : this.tool == Tool.PUPIL_BACKGROUND ? I18n.format("mobends.blink.legend.background")
                     : this.tool == Tool.PAINT_EYELIDS
-                        ? "Outlined: active coherent eyelid"
-                        : "Outlined: active superposed eyebrow";
+                        ? I18n.format("mobends.blink.legend.eyelid")
+                        : I18n.format("mobends.blink.legend.eyebrow");
         this.drawString(this.fontRendererObj, legend, canvasX, canvasY + 133, 0xbfbfbf);
     }
 
@@ -425,23 +429,26 @@ public class GuiBlinkSkinEditor extends GuiScreen {
 
     private void exportSkin() {
         if (this.skin == null || !hasSelection()) {
-            this.status = "Load a skin and select at least one eye pixel first.";
+            this.statusSuccess = false;
+            this.status = I18n.format("mobends.blink.selectionRequired");
             return;
         }
         if (BlinkSkinExporter.hasBlinkData(this.skin) && !this.replaceArmed) {
             this.replaceArmed = true;
-            this.status = "This skin already has blink data. Click Export again to replace it in the new copy.";
+            this.statusSuccess = false;
+            this.status = I18n.format("mobends.blink.replaceWarning");
             return;
         }
         BufferedImage output = BlinkSkinExporter.export(
             this.skin, this.eyeGroups, this.pupils, this.closedColors, this.pupilBackgroundColors,
             this.eyebrowGroups, this.eyebrowColors);
-        FileDialog dialog = new FileDialog((Frame)null, "Save blinking skin", FileDialog.SAVE);
+        FileDialog dialog = new FileDialog((Frame)null, I18n.format("mobends.blink.saveDialog"), FileDialog.SAVE);
         String playerName = this.mc.thePlayer == null ? "player" : this.mc.thePlayer.getCommandSenderName();
         dialog.setFile(safeName(playerName) + "_blinking.png");
         dialog.setVisible(true);
         if (dialog.getFile() == null) {
-            this.status = "Export cancelled.";
+            this.statusSuccess = false;
+            this.status = I18n.format("mobends.blink.cancelled");
             return;
         }
         File file = new File(dialog.getDirectory(), dialog.getFile());
@@ -450,9 +457,11 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         }
         try {
             ImageIO.write(output, "png", file);
-            this.status = "Saved " + file.getName() + ". Upload it as your skin to enable blinking.";
+            this.status = I18n.format("mobends.blink.saved", file.getName());
+            this.statusSuccess = true;
         } catch (IOException exception) {
-            this.status = "Could not save: " + exception.getMessage();
+            this.statusSuccess = false;
+            this.status = I18n.format("mobends.blink.saveFailed", exception.getMessage());
         }
     }
 
@@ -465,13 +474,15 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     private void confirmWawelAuthUpload() {
         Account account = WawelAuthSkinUpload.activeAccount();
         if (account == null) {
-            this.status = "No active Wawel Auth account. Activate an account before uploading.";
+            this.statusSuccess = false;
+            this.status = I18n.format("mobends.upload.noAccount");
             return;
         }
         this.mc.displayGuiScreen(new GuiWawelAuthUploadConfirm(account, confirmed -> {
             this.mc.displayGuiScreen(this);
             if (!confirmed) {
-                this.status = "Wawel Auth upload cancelled.";
+                this.statusSuccess = false;
+                this.status = I18n.format("mobends.upload.cancelled");
                 return;
             }
             startWawelAuthUpload(account);
@@ -480,17 +491,20 @@ public class GuiBlinkSkinEditor extends GuiScreen {
 
     private void startWawelAuthUpload(Account account) {
         this.uploading = true;
-        this.status = "Uploading skin for " + account.name + " via " + account.provider + "...";
+        this.statusSuccess = false;
+        this.status = I18n.format("mobends.upload.progress", account.name, account.provider);
         updateExportButton();
         BufferedImage output = generatedSkin();
         boolean slim = WawelAuthCompat.isSlim(this.mc.thePlayer);
         WawelAuthSkinUpload.upload(account, output, slim, (result, error) -> {
             this.uploading = false;
             if (error != null) {
-                this.status = "Wawel Auth upload failed: " + error;
+                this.statusSuccess = false;
+                this.status = I18n.format("mobends.upload.failed", error);
             } else {
                 BlinkingTextures.invalidatePlayer(account.uuid);
-                this.status = result == null ? "Uploaded skin via Wawel Auth." : result;
+                this.statusSuccess = false;
+                this.status = result == null ? I18n.format("mobends.upload.success") : result;
             }
             updateExportButton();
         });
@@ -499,15 +513,16 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     private void setTool(Tool tool) {
         this.tool = tool;
         this.eyedropperArmed = false;
+        this.statusSuccess = false;
         this.status = tool == Tool.EYE_REGION
-            ? "Paint every eye pixel; each four-directionally connected island becomes one coherent eye."
+            ? I18n.format("mobends.blink.help.regions")
             : tool == Tool.PUPILS
-                ? "Left drag marks pupil pixels inside the eye region; right drag clears them."
+                ? I18n.format("mobends.blink.help.pupils")
                 : tool == Tool.PUPIL_BACKGROUND
-                    ? "Choose a color, then click or drag pupil pixels to paint the revealed background."
+                    ? I18n.format("mobends.blink.help.background")
                     : tool == Tool.PAINT_EYELIDS
-                        ? "Choose a color, then paint eyelid pixels inside either eye; right drag erases."
-                        : "Choose Left or Right and paint an independent eyebrow overlay; right drag erases.";
+                        ? I18n.format("mobends.blink.help.eyelids")
+                        : I18n.format("mobends.blink.help.eyebrows");
         updateToolControls();
     }
 
@@ -519,19 +534,19 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         boolean grouped = this.tool == Tool.EYEBROWS;
         if (leftGroup != null) {
             leftGroup.visible = grouped;
-            leftGroup.displayString = this.activeGroup == 1 ? "[Left group]" : "Left group";
+            leftGroup.displayString = this.activeGroup == 1 ? I18n.format("mobends.blink.leftGroup.selected") : I18n.format("mobends.blink.leftGroup");
         }
         if (rightGroup != null) {
             rightGroup.visible = grouped;
-            rightGroup.displayString = this.activeGroup == 2 ? "[Right group]" : "Right group";
+            rightGroup.displayString = this.activeGroup == 2 ? I18n.format("mobends.blink.rightGroup.selected") : I18n.format("mobends.blink.rightGroup");
         }
         if (pick != null) {
             pick.visible = isColorTool();
-            pick.displayString = this.eyedropperArmed ? "[Picking from skin]" : "Pick color from skin";
+            pick.displayString = this.eyedropperArmed ? I18n.format("mobends.blink.picking") : I18n.format("mobends.blink.pickColor");
         }
         if (blink != null) {
             blink.visible = this.tool == Tool.PAINT_EYELIDS || this.tool == Tool.EYEBROWS;
-            blink.displayString = this.tool == Tool.PAINT_EYELIDS ? "Open Eyes" : "Blink";
+            blink.displayString = this.tool == Tool.PAINT_EYELIDS ? I18n.format("mobends.blink.openEyes") : I18n.format("mobends.blink.blink");
         }
         if (this.hexField != null) {
             this.hexField.setVisible(isColorTool());
@@ -545,7 +560,8 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         }
         if (this.tool == Tool.PUPILS) {
             if (value && this.eyeGroups[x][y] == 0) {
-                this.status = "Pupil pixels must first be included in the eye region.";
+                this.statusSuccess = false;
+                this.status = I18n.format("mobends.blink.pupilsRequired");
                 return;
             }
             boolean wasPupil = this.pupils[x][y];
@@ -560,7 +576,8 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     private void paintPixel(int x, int y, boolean value) {
         if (this.tool == Tool.PUPIL_BACKGROUND) {
             if (!this.pupils[x][y]) {
-                this.status = "Pupil backgrounds can only be painted on marked pupil pixels.";
+                this.statusSuccess = false;
+                this.status = I18n.format("mobends.blink.backgroundRequired");
                 return;
             }
             if (value) {
@@ -568,7 +585,8 @@ public class GuiBlinkSkinEditor extends GuiScreen {
             }
         } else if (this.tool == Tool.PAINT_EYELIDS) {
             if (this.eyeGroups[x][y] == 0) {
-                this.status = "Eyelid pixels must be inside one of the marked eye regions.";
+                this.statusSuccess = false;
+                this.status = I18n.format("mobends.blink.eyelidsRequired");
                 return;
             }
             this.closedColors[x][y] = value ? currentColor()
@@ -712,11 +730,11 @@ public class GuiBlinkSkinEditor extends GuiScreen {
     }
 
     private String stepName() {
-        return "Step " + (this.tool.ordinal() + 1) + "/" + Tool.values().length + ": "
-            + (this.tool == Tool.EYE_REGION ? "Eye regions"
-                : this.tool == Tool.PUPILS ? "Pupils"
-                    : this.tool == Tool.PUPIL_BACKGROUND ? "Pupil background"
-                        : this.tool == Tool.PAINT_EYELIDS ? "Eyelids" : "Eyebrows");
+        return I18n.format("mobends.blink.step", this.tool.ordinal() + 1, Tool.values().length,
+            (this.tool == Tool.EYE_REGION ? I18n.format("mobends.blink.tool.regions")
+                : this.tool == Tool.PUPILS ? I18n.format("mobends.blink.tool.pupils")
+                    : this.tool == Tool.PUPIL_BACKGROUND ? I18n.format("mobends.blink.tool.background")
+                        : this.tool == Tool.PAINT_EYELIDS ? I18n.format("mobends.blink.tool.eyelids") : I18n.format("mobends.blink.tool.eyebrows")));
     }
 
     private void inferEyeComponents() {
@@ -774,9 +792,10 @@ public class GuiBlinkSkinEditor extends GuiScreen {
         }
         inferEyeComponents();
         this.replaceArmed = true;
+        this.statusSuccess = false;
         this.status = data.customExpressions
-            ? "Loaded the existing eye, pupil, eyelid, and eyebrow definitions from this skin."
-            : "Recovered the editable eyelid region and colors from this ETF blinking skin.";
+            ? I18n.format("mobends.blink.loaded")
+            : I18n.format("mobends.blink.recovered");
     }
 
     private void updateExportButton() {

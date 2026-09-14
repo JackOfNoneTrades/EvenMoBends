@@ -23,6 +23,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -95,21 +96,21 @@ extends GuiScreen {
         super.initGui();
         this.buttonList.clear();
         if (this.customizeWindow | this.settingsWindow | this.packsWindow) {
-            this.buttonList.add(new GuiButton(0, this.packsWindow ? this.width - 70 : 10, this.height - 30, 60, 20, "Back"));
+            this.buttonList.add(new GuiButton(0, this.packsWindow ? this.width - 70 : 10, this.height - 30, 60, 20, I18n.format("mobends.gui.back")));
         }
         if (!this.customizeWindow & !this.settingsWindow & !this.packsWindow) {
-            this.buttonList.add(new GuiButton(1, -90 + (int)(this.leftBgState * 100.0f), this.height - 30, 60, 20, "Settings"));
-            this.buttonList.add(new GuiButton(3, this.width - (int)(this.leftBgState * 100.0f) + 30, this.height - 30, 60, 20, "Packs"));
-            this.buttonList.add(new GuiButton(6, this.width / 2 - 60, this.height - 30, 120, 20, "Prepare Blinking Skin"));
+            this.buttonList.add(new GuiButton(1, -90 + (int)(this.leftBgState * 100.0f), this.height - 30, 60, 20, I18n.format("mobends.menu.settings")));
+            this.buttonList.add(new GuiButton(3, this.width - (int)(this.leftBgState * 100.0f) + 30, this.height - 30, 60, 20, I18n.format("mobends.menu.packs")));
+            this.buttonList.add(new GuiButton(6, this.width / 2 - 60, this.height - 30, 120, 20, I18n.format("mobends.blink.title")));
         }
         if (this.settingsWindow) {
             for (i = 0; i < SettingsNode.settings.length; ++i) {
                 if (!(SettingsNode.settings[i] instanceof SettingsBoolean)) continue;
-                this.buttonList.add(new GuiToggleButton(10 + i, (int)((float)this.width + this.presetWindowState * -500.0f + 20.0f), 50 + i * 25, ((SettingsBoolean)SettingsNode.settings[i]).data).setTitle(SettingsNode.settings[i].displayName, 100));
+                this.buttonList.add(new GuiToggleButton(10 + i, (int)((float)this.width + this.presetWindowState * -500.0f + 20.0f), 50 + i * 25, ((SettingsBoolean)SettingsNode.settings[i]).data).setTitle(I18n.format("mobends.settings." + SettingsNode.settings[i].id), 100));
             }
         }
         if (this.customizeWindow) {
-            this.buttonList.add(new GuiToggleButton(2, (int)((float)this.width + this.presetWindowState * -500.0f + 10.0f), 163, AnimatedEntity.animatedEntities[this.animatedEntityID].animate).setTitle("Animate", 88));
+            this.buttonList.add(new GuiToggleButton(2, (int)((float)this.width + this.presetWindowState * -500.0f + 10.0f), 163, AnimatedEntity.animatedEntities[this.animatedEntityID].animate).setTitle(I18n.format("mobends.menu.animate"), 88));
             if (this.getCurrentAction() != null) {
                 this.buttonList.add(new GuiButton(4, (int)(this.getModelSelectionLoc().x + this.getModelSelectionSize().x - 40.0f), (int)this.getModelSelectionLoc().y + 95, 20, 20, "+"));
                 GuiButton minus = new GuiButton(5, (int)(this.getModelSelectionLoc().x + this.getModelSelectionSize().x - 20.0f), (int)this.getModelSelectionLoc().y + 95, 20, 20, "-");
@@ -118,7 +119,7 @@ extends GuiScreen {
             }
         }
         for (i = 0; i < AnimatedEntity.animatedEntities.length; ++i) {
-            this.buttonList.add(new GuiButton(100 + i, (int)(this.buttonPositions[i] - 80.0f + this.presetWindowState * -100.0f), 70 + i * 25, 80, 20, AnimatedEntity.animatedEntities[i].displayName));
+            this.buttonList.add(new GuiButton(100 + i, (int)(this.buttonPositions[i] - 80.0f + this.presetWindowState * -100.0f), 70 + i * 25, 80, 20, I18n.format("mobends.entity." + AnimatedEntity.animatedEntities[i].id)));
         }
         if (this.custom_AnimationNameText == null) {
             this.custom_AnimationNameText = new GuiTextField(this.fontRendererObj, (int)(this.getModelSelectionLoc().x + 5.0f), (int)(this.getModelSelectionLoc().y + 5.0f + 10.0f), (int)(this.getModelSelectionSize().x - 10.0f), 15);
@@ -152,7 +153,7 @@ extends GuiScreen {
         if (this.custom_PackTitle == null) {
             this.custom_PackTitle = new GuiTextField(this.fontRendererObj, (int)(this.getActionWindowX() + 5.0f), 38, 150, 14);
             if (BendsPack.currentPack == 0) {
-                this.custom_PackTitle.setText("Default");
+                this.custom_PackTitle.setText(I18n.format("mobends.pack.default.name"));
             } else {
                 this.custom_PackTitle.setText(BendsPack.getCurrentPack().displayName);
             }
@@ -276,7 +277,7 @@ extends GuiScreen {
                     }
                 }
                 BendsPack.currentPack = i;
-                this.custom_PackTitle.setText(BendsPack.getCurrentPack().displayName);
+                this.custom_PackTitle.setText((BendsPack.currentPack == 0 ? I18n.format("mobends.pack.default.name") : BendsPack.getCurrentPack().displayName));
                 try {
                     BendsPack.getCurrentPack().apply();
                     continue;
@@ -325,7 +326,7 @@ extends GuiScreen {
             }
             if ((BendsPack.getTargetByID(AnimatedEntity.animatedEntities[this.animatedEntityID].id) == null || BendsPack.getTargetByID((String)AnimatedEntity.animatedEntities[this.animatedEntityID].id).actions.size() <= 0) && (float)x >= this.getActionWindowX() & (float)x <= this.getActionWindowX() + 16.0f & (float)y >= 65.0f + this.getYScrollAmount() & (float)y <= 65.0f + this.getYScrollAmount() + 16.0f) {
                 if (BendsPack.currentPack == 0) {
-                    this.createANewPack("Untitled");
+                    this.createANewPack(I18n.format("mobends.pack.untitled"));
                 }
                 this.addNewDefaultAction("all");
             }
@@ -407,7 +408,7 @@ extends GuiScreen {
         newPack.filename = null;
         newPack.displayName = string;
         newPack.author = Minecraft.getMinecraft().thePlayer.getCommandSenderName();
-        newPack.description = "A custom pack made by " + Minecraft.getMinecraft().thePlayer.getCommandSenderName() + ".";
+        newPack.description = I18n.format("mobends.pack.custom.description", Minecraft.getMinecraft().thePlayer.getCommandSenderName());
         BendsPack.bendsPacks.add(newPack);
         BendsPack.currentPack = BendsPack.bendsPacks.size() - 1;
         this.custom_PackTitle.setText(newPack.displayName);
@@ -508,21 +509,22 @@ extends GuiScreen {
             this.displayCustomizeWindow();
         }
         if (this.presetWindowState > 0.0f & this.settingsWindow) {
-            String title = "Settings";
+            String title = I18n.format("mobends.menu.settings");
             this.drawString(this.fontRendererObj, title, (int)((float)this.width + this.presetWindowState * -500.0f + 250.0f - (float)(this.fontRendererObj.getStringWidth(title) / 2)), 5, 0xFFFFFF);
         }
         if (this.presetWindowState > 0.0f & this.packsWindow) {
-            String title = "Packs";
+            String title = I18n.format("mobends.menu.packs");
             this.drawString(this.fontRendererObj, title, (int)((float)this.width + this.presetWindowState * -250.0f + 125.0f - (float)(this.fontRendererObj.getStringWidth(title) / 2)), 5, 0xFFFFFF);
             for (int i = 0; i < BendsPack.bendsPacks.size(); ++i) {
+                String description = i == 0 ? I18n.format("mobends.pack.default.description") : BendsPack.bendsPacks.get(i).description;
                 ArrayList<String> text = new ArrayList<String>();
                 text.add("");
                 int var1 = 0;
                 int lineLength = 0;
                 int s = 0;
-                while (s < BendsPack.bendsPacks.get((int)i).description.length()) {
-                    text.set(var1, (String)text.get(var1) + BendsPack.bendsPacks.get((int)i).description.charAt(s));
-                    if ((float)this.fontRendererObj.getStringWidth((String)text.get(var1)) * 0.5f > 128.0f && BendsPack.bendsPacks.get((int)i).description.charAt(s) == ' ') {
+                while (s < description.length()) {
+                    text.set(var1, (String)text.get(var1) + description.charAt(s));
+                    if ((float)this.fontRendererObj.getStringWidth((String)text.get(var1)) * 0.5f > 128.0f && description.charAt(s) == ' ') {
                         lineLength = 0;
                         ++var1;
                         text.add("");
@@ -538,11 +540,11 @@ extends GuiScreen {
                 } else {
                     Draw.rectangle_xgradient((float)this.width + this.presetWindowState * -250.0f + 10.0f, i * 70 + 30, 200.0f, 64.0f, new Color(0.0f, 0.0f, 0.0f, 0.5f), new Color(0.1f, 1.0f, 0.1f, 0.5f));
                 }
-                this.drawString(this.fontRendererObj, BendsPack.bendsPacks.get((int)i).displayName, (int)((float)this.width + this.presetWindowState * -250.0f + 10.0f) + 5, i * 70 + 30 + 5, 0xFFFFFF);
+                this.drawString(this.fontRendererObj, i == 0 ? I18n.format("mobends.pack.default.name") : BendsPack.bendsPacks.get((int)i).displayName, (int)((float)this.width + this.presetWindowState * -250.0f + 10.0f) + 5, i * 70 + 30 + 5, 0xFFFFFF);
                 GL11.glPushMatrix();
                 GL11.glTranslatef((float)((int)((float)this.width + this.presetWindowState * -250.0f + 10.0f) + 5), (float)(i * 70 + 30 + 5 + 10), (float)0.0f);
                 GL11.glScalef((float)0.5f, (float)0.5f, (float)0.5f);
-                this.drawString(this.fontRendererObj, "By " + BendsPack.bendsPacks.get((int)i).author, 0, 0, 0x777777);
+                this.drawString(this.fontRendererObj, I18n.format("mobends.pack.author", BendsPack.bendsPacks.get((int)i).author), 0, 0, 0x777777);
                 for (s = 0; s < text.size(); ++s) {
                     this.drawString(this.fontRendererObj, (String)text.get(s), 0, 20 + s * 10, 0xFFFFFF);
                 }
@@ -599,7 +601,7 @@ extends GuiScreen {
 
     public void displayCustomizeWindow() {
         GL11.glColor4f((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
-        String title = "Animation Customization";
+        String title = I18n.format("mobends.menu.customization");
         this.drawCenteredString(this.fontRendererObj, title, (int)((float)this.width + this.presetWindowState * -500.0f + 250.0f), 5, 0xFFFFFF);
         GL11.glPushMatrix();
         GL11.glColor4f((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
@@ -612,7 +614,7 @@ extends GuiScreen {
             AnimatedEntity.animatedEntities[this.animatedEntityID].entity.worldObj = Minecraft.getMinecraft().theWorld;
             this.renderLivingEntity((int)((float)this.width + this.presetWindowState * -500.0f + 10.0f + 64.0f), 150, 50, (EntityLivingBase)AnimatedEntity.animatedEntities[this.animatedEntityID].entity);
         }
-        String warning = "* to see the changes after toggling the animations ON or OFF, restart your game.";
+        String warning = I18n.format("mobends.menu.restart");
         this.drawString(this.fontRendererObj, warning, (int)((float)this.width + this.presetWindowState * -500.0f + 20.0f), this.height - 20, 0xFFFFFF);
         GL11.glPushMatrix();
         Minecraft.getMinecraft().renderEngine.bindTexture(ClientProxy.texture_NULL);
@@ -620,9 +622,9 @@ extends GuiScreen {
         Draw.rectangle(this.getModelSelectionLoc().x, this.getModelSelectionLoc().y, this.getModelSelectionSize().x, this.getModelSelectionSize().y);
         GL11.glPopMatrix();
         if (this.getCurrentAction() != null) {
-            this.drawString(this.fontRendererObj, "Animation:", this.custom_AnimationNameText.xPosition, this.custom_AnimationNameText.yPosition - 10, 0xFFFFFF);
-            this.drawString(this.fontRendererObj, "Model:", this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition - 10, 0xFFFFFF);
-            this.drawString(this.fontRendererObj, "Modifier:", this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition - 10 + 15 + 5 + 10, 0xFFFFFF);
+            this.drawString(this.fontRendererObj, I18n.format("mobends.menu.animation"), this.custom_AnimationNameText.xPosition, this.custom_AnimationNameText.yPosition - 10, 0xFFFFFF);
+            this.drawString(this.fontRendererObj, I18n.format("mobends.menu.model"), this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition - 10, 0xFFFFFF);
+            this.drawString(this.fontRendererObj, I18n.format("mobends.menu.modifier"), this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition - 10 + 15 + 5 + 10, 0xFFFFFF);
             this.custom_AnimationNameText.drawTextBox();
             this.custom_ModelNameText.drawTextBox();
             GL11.glColor4f((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
@@ -638,9 +640,9 @@ extends GuiScreen {
             Minecraft.getMinecraft().renderEngine.bindTexture(this.getCurrentAction().mod == BendsAction.EnumModifier.SIN ? puzzle_mod_sin_selected : puzzle_mod_sin);
             Draw.rectangle(this.getModelSelectionLoc().x + 5.0f + 36.0f, this.custom_ModelNameText.yPosition + 15 + 5 + 10, 32.0f, 16.0f);
             GL11.glPopMatrix();
-            this.drawString(this.fontRendererObj, "Calculation:", this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition - 10 + 60, 0xFFFFFF);
+            this.drawString(this.fontRendererObj, I18n.format("mobends.menu.calculation"), this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition - 10 + 60, 0xFFFFFF);
             if (this.getCurrentCalculation() != null) {
-                this.drawString(this.fontRendererObj, "Value:", this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition + 15 + 5 + 60 - 1, this.isValidCalcValue(this.custom_CalcValueText.getText()) ? 0xFFFFFF : 0xFF0000);
+                this.drawString(this.fontRendererObj, I18n.format("mobends.menu.value"), this.custom_ModelNameText.xPosition, this.custom_ModelNameText.yPosition + 15 + 5 + 60 - 1, this.isValidCalcValue(this.custom_CalcValueText.getText()) ? 0xFFFFFF : 0xFF0000);
                 GL11.glPushMatrix();
                 Minecraft.getMinecraft().renderEngine.bindTexture(this.getCurrentCalculation().operator == BendsAction.EnumOperator.ADD ? puzzle_calc_add_selected : puzzle_calc_add);
                 Draw.rectangle(this.getModelSelectionLoc().x + 5.0f, this.custom_ModelNameText.yPosition + 60, 16.0f, 16.0f);
