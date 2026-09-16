@@ -158,10 +158,12 @@ extends ModelBiped {
         this.bipedLeftLeg.addChild(this.bipedLeftForeLeg);
         ((ModelRendererBends_SeperatedChild)this.bipedRightArm).setSeperatedPart((ModelRendererBends)this.bipedRightForeArm);
         ((ModelRendererBends_SeperatedChild)this.bipedLeftArm).setSeperatedPart((ModelRendererBends)this.bipedLeftForeArm);
-        ((ModelRendererBends)this.bipedRightArm).offsetBox_Add(-0.01f, 0.0f, -0.01f).resizeBox(4.02f, 6.0f, 4.02f).updateVertices();
-        ((ModelRendererBends)this.bipedLeftArm).offsetBox_Add(-0.01f, 0.0f, -0.01f).resizeBox(4.02f, 6.0f, 4.02f).updateVertices();
-        ((ModelRendererBends)this.bipedRightLeg).offsetBox_Add(-0.01f, 0.0f, -0.01f).resizeBox(4.02f, 6.0f, 4.02f).updateVertices();
-        ((ModelRendererBends)this.bipedLeftLeg).offsetBox_Add(-0.01f, 0.0f, -0.01f).resizeBox(4.02f, 6.0f, 4.02f).updateVertices();
+        // Expand the existing vertices: rebuilding from uninflated box dimensions
+        // discards armor thickness and lets modern skin overlays protrude through it.
+        separateUpperJoint((ModelRendererBends)this.bipedRightArm);
+        separateUpperJoint((ModelRendererBends)this.bipedLeftArm);
+        separateUpperJoint((ModelRendererBends)this.bipedRightLeg);
+        separateUpperJoint((ModelRendererBends)this.bipedLeftLeg);
     }
 
     @Override
