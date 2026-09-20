@@ -12,6 +12,8 @@ import net.gobbob.mobends.client.model.ModelBoxBends;
 import net.gobbob.mobends.client.model.ModelRendererBends;
 import net.gobbob.mobends.client.model.ModelRendererBends_SeperatedChild;
 import net.gobbob.mobends.client.renderer.SwordTrail;
+import net.gobbob.mobends.client.renderer.SwimmingItemTransform;
+import net.gobbob.mobends.client.renderer.SwimmingArmClearance;
 import net.gobbob.mobends.compat.AquaAcrobaticsCompat;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers;
 import net.gobbob.mobends.compat.WawelAuth3DSkinLayers.Layers;
@@ -37,6 +39,7 @@ import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemPickaxe;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 public class ModelBendsPlayer
 extends ModelBiped {
@@ -49,6 +52,13 @@ extends ModelBiped {
     public SmoothVector3f renderOffset = new SmoothVector3f();
     public SmoothVector3f renderRotation = new SmoothVector3f();
     public SmoothVector3f renderItemRotation = new SmoothVector3f();
+    // Main/offhand attachment blend (X/Y), external Aqua Acrobatics body pitch (Z).
+    public SmoothVector3f swimmingItemPose = new SmoothVector3f();
+    public final Vector4f swimmingRightArmAdjustment = new Vector4f();
+    public final Vector4f swimmingLeftArmAdjustment = new Vector4f();
+    public final Vector3f swimmingElbowAdjustment = new Vector3f();
+    public final Vector4f swimmingRightItemAdjustment = new Vector4f();
+    public final Vector4f swimmingLeftItemAdjustment = new Vector4f();
     public SwordTrail swordTrail = new SwordTrail();
     public float headRotationX;
     public float headRotationY;
@@ -112,10 +122,10 @@ extends ModelBiped {
         this.bipedBody = new ModelRendererBends(this, 16, 16).setShowChildIfHidden(true);
         this.bipedBody.addBox(-4.0f, -12.0f, -2.0f, 8, 12, 4, p_i1149_1_);
         this.bipedBody.setRotationPoint(0.0f, 0.0f + p_i1149_2_ + 12.0f, 0.0f);
-        this.bipedRightArm = new ModelRendererBends_SeperatedChild(this, 40, 16).setMother((ModelRendererBends)this.bipedBody);
+        this.bipedRightArm = new PlayerArm(false).setMother((ModelRendererBends)this.bipedBody);
         this.bipedRightArm.addBox(-3.0f, -2.0f, -2.0f, 4, 6, 4, p_i1149_1_);
         this.bipedRightArm.setRotationPoint(-5.0f, 2.0f + p_i1149_2_ - 12.0f, 0.0f);
-        this.bipedLeftArm = new ModelRendererBends_SeperatedChild(this, 40, 16).setMother((ModelRendererBends)this.bipedBody);
+        this.bipedLeftArm = new PlayerArm(true).setMother((ModelRendererBends)this.bipedBody);
         this.bipedLeftArm.mirror = true;
         this.bipedLeftArm.addBox(-1.0f, -2.0f, -2.0f, 4, 6, 4, p_i1149_1_);
         this.bipedLeftArm.setRotationPoint(5.0f, 2.0f + p_i1149_2_ - 12.0f, 0.0f);
@@ -126,12 +136,12 @@ extends ModelBiped {
         this.bipedLeftLeg.mirror = true;
         this.bipedLeftLeg.addBox(-2.0f, 0.0f, -2.0f, 4, 6, 4, p_i1149_1_);
         this.bipedLeftLeg.setRotationPoint(1.9f, 12.0f + p_i1149_2_, 0.0f);
-        this.bipedRightForeArm = new ModelRendererBends(this, 40, 22);
+        this.bipedRightForeArm = new PlayerForeArm(false);
         this.bipedRightForeArm.addBox(0.0f, 0.0f, -4.0f, 4, 6, 4, p_i1149_1_);
         this.bipedRightForeArm.setRotationPoint(-3.0f, 4.0f, 2.0f);
         ((ModelRendererBends)this.bipedRightForeArm).getBox().offsetTextureQuad(this.bipedRightForeArm, 3, 0.0f, -6.0f);
         ((ModelRendererBends)this.bipedRightForeArm).getBox().hideQuad(ModelBoxBends.TOP);
-        this.bipedLeftForeArm = new ModelRendererBends(this, 40, 22);
+        this.bipedLeftForeArm = new PlayerForeArm(true);
         this.bipedLeftForeArm.mirror = true;
         this.bipedLeftForeArm.addBox(0.0f, 0.0f, -4.0f, 4, 6, 4, p_i1149_1_);
         this.bipedLeftForeArm.setRotationPoint(-1.0f, 4.0f, 2.0f);
@@ -293,11 +303,18 @@ extends ModelBiped {
         this.renderOffset.set(data.renderOffset);
         this.renderRotation.set(data.renderRotation);
         this.renderItemRotation.set(data.renderItemRotation);
+        this.swimmingItemPose.set(data.swimmingItemPose);
+        this.swimmingRightArmAdjustment.set(data.swimmingRightArmAdjustment);
+        this.swimmingLeftArmAdjustment.set(data.swimmingLeftArmAdjustment);
+        this.swimmingElbowAdjustment.set(data.swimmingElbowAdjustment);
+        this.swimmingRightItemAdjustment.set(data.swimmingRightItemAdjustment);
+        this.swimmingLeftItemAdjustment.set(data.swimmingLeftItemAdjustment);
         this.swordTrail = data.swordTrail;
         if (Data_Player.get(argEntity.getEntityId()).canBeUpdated()) {
             this.renderOffset.setSmooth(new Vector3f(0.0f, -1.0f, 0.0f), 0.5f);
             this.renderRotation.setSmooth(new Vector3f(0.0f, 0.0f, 0.0f), 0.5f);
             this.renderItemRotation.setSmooth(new Vector3f(0.0f, 0.0f, 0.0f), 0.5f);
+            this.swimmingItemPose.setSmoothZero(0.3f);
             ((ModelRendererBends)this.bipedHead).resetScale();
             ((ModelRendererBends)this.bipedHeadwear).resetScale();
             ((ModelRendererBends)this.bipedBody).resetScale();
@@ -314,6 +331,7 @@ extends ModelBiped {
             AquaAcrobaticsCompat.State aqua = AquaAcrobaticsCompat.getState(player, this.partialTicks);
             BoatState boat = Animation_Rowing.getBoatState(player, this.partialTicks);
             boolean rowing = false;
+            boolean swimming = false;
             boolean elytraFlying = EtFuturumRequiemCompat.isElytraFlying(player);
             boolean creativeFlying = player.capabilities.isFlying && !data.isOnGround();
             boolean touchingWater = this.isTouchingWater(argEntity);
@@ -332,9 +350,11 @@ extends ModelBiped {
             } else if (touchingWater && !groundedInWater) {
                 if (aqua.available) {
                     // With AA, being in water alone does not mean the player is swimming horizontally.
-                    if (PlayerAnimationConfig.isEnabled("swimming")) Animation_Swimming.apply(this, data.ticks, false);
-                } else if (!this.shouldAnimateDiving(argEntity, data) || !this.animatePlayer("diving", argEntity, data)) {
-                    this.animatePlayer("swimming", argEntity, data);
+                    swimming = PlayerAnimationConfig.isEnabled("swimming");
+                    if (swimming) Animation_Swimming.apply(this, data.ticks, false);
+                } else {
+                    swimming = this.shouldAnimateDiving(argEntity, data) && this.animatePlayer("diving", argEntity, data);
+                    if (!swimming) swimming = this.animatePlayer("swimming", argEntity, data);
                 }
             } else if (player.isOnLadder() && this.animatePlayer("climbing", argEntity, data)) {
                 // Climbing takes precedence over the ordinary airborne animations.
@@ -361,8 +381,9 @@ extends ModelBiped {
                 // Both hands are occupied by paddles, even while coasting or holding a tool.
             } else if ((blockingHands & PlayerBlockingCompat.MAIN_HAND) != 0) {
                 // Do not let a recent sword swing/stance compete with main-hand blocking.
-            } else if (aqua.isActive() && !player.isSwingInProgress && player.getItemInUseCount() == 0) {
-                // Keep weapon recovery stances from replacing the swimming/crawling arm cycle.
+            } else if ((aqua.isActive() || swimming) && !player.isSwingInProgress && player.getItemInUseCount() == 0) {
+                // Let actual attacks/use override swimming, but keep recovery stances
+                // from replacing either arm's swimming stroke.
             } else if (this.aimedBow) {
                 this.animatePlayer("bow", argEntity, data);
             } else if (((EntityPlayer)argEntity).getCurrentEquippedItem() != null && ((EntityPlayer)argEntity).getCurrentEquippedItem().getItem() instanceof ItemPickaxe || ((EntityPlayer)argEntity).getCurrentEquippedItem() != null && Block.getBlockFromItem(((EntityPlayer)argEntity).getCurrentEquippedItem().getItem()) != Blocks.air) {
@@ -374,6 +395,22 @@ extends ModelBiped {
             }
             if (!(rowing && boat.driver)) {
                 Animation_Blocking.apply(this, blockingHands);
+            }
+            // Local input avoids treating water drift after releasing the keys as swimming.
+            // Remote players use their interpolated movement, since their input is unavailable.
+            boolean travelling = player == Minecraft.getMinecraft().thePlayer
+                ? player.moveForward != 0 || player.moveStrafing != 0
+                : argSwingAmount > 0.01f;
+            if (!travelling) {
+                this.swimmingItemPose.setSmoothX(0, 0.3f);
+                this.swimmingItemPose.setSmoothY(0, 0.3f);
+            }
+            if (player.isSwingInProgress || player.getItemInUseCount() > 0
+                || (blockingHands & PlayerBlockingCompat.MAIN_HAND) != 0) {
+                this.swimmingItemPose.setX(0.0f);
+            }
+            if (this.aimedBow || (blockingHands & PlayerBlockingCompat.OFF_HAND) != 0) {
+                this.swimmingItemPose.setY(0.0f);
             }
             ((ModelRendererBends)this.bipedHead).update(data.ticksPerFrame);
             ((ModelRendererBends)this.bipedHeadwear).update(data.ticksPerFrame);
@@ -389,6 +426,8 @@ extends ModelBiped {
             this.renderOffset.update(data.ticksPerFrame);
             this.renderRotation.update(data.ticksPerFrame);
             this.renderItemRotation.update(data.ticksPerFrame);
+            this.swimmingItemPose.update(data.ticksPerFrame);
+            SwimmingArmClearance.update(this, data.ticksPerFrame);
             this.swordTrail.update(data.ticksPerFrame);
             data.updatedThisFrame = true;
         }
@@ -442,12 +481,77 @@ extends ModelBiped {
         GL11.glRotatef((float)this.renderItemRotation.vSmooth.z, (float)0.0f, (float)0.0f, (float)1.0f);
     }
 
+    private final class PlayerForeArm extends ModelRendererBends {
+        private final boolean left;
+
+        private PlayerForeArm(boolean left) {
+            super(ModelBendsPlayer.this, 40, 22);
+            this.left = left;
+        }
+
+        @Override
+        protected boolean hasPreRotation() {
+            return super.hasPreRotation() || adjustment() != 0;
+        }
+
+        @Override
+        public void applyPreRotation() {
+            GL11.glRotatef(adjustment(), 1, 0, 0);
+            super.applyPreRotation();
+        }
+
+        private float adjustment() {
+            return this.left ? swimmingElbowAdjustment.y : swimmingElbowAdjustment.x;
+        }
+    }
+
+    /** Both vanilla and Backhand attach held items through the corresponding arm. */
+    private final class PlayerArm extends ModelRendererBends_SeperatedChild {
+        private final boolean left;
+
+        private PlayerArm(boolean left) {
+            super(ModelBendsPlayer.this, 40, 16);
+            this.left = left;
+        }
+
+        @Override
+        protected boolean hasPreRotation() {
+            return super.hasPreRotation() || adjustment().w != 0;
+        }
+
+        @Override
+        public void applyPreRotation() {
+            Vector4f adjustment = adjustment();
+            if (adjustment.w != 0) GL11.glRotatef(adjustment.w, adjustment.x, adjustment.y, adjustment.z);
+            super.applyPreRotation();
+        }
+
+        private Vector4f adjustment() {
+            return this.left ? swimmingLeftArmAdjustment : swimmingRightArmAdjustment;
+        }
+
+        @Override
+        public void postRender(float scale) {
+            super.postRender(scale);
+            int held = this.left ? heldItemLeft : heldItemRight;
+            if (held != 0 && held != 3 && !aimedBow) {
+                SwimmingItemTransform.apply(ModelBendsPlayer.this, this.left, scale);
+            }
+        }
+    }
+
     public void updateWithEntityData(AbstractClientPlayer argPlayer) {
         Data_Player data = Data_Player.get(argPlayer.getEntityId());
         if (data != null) {
             this.renderOffset.set(data.renderOffset);
             this.renderRotation.set(data.renderRotation);
             this.renderItemRotation.set(data.renderItemRotation);
+            this.swimmingItemPose.set(data.swimmingItemPose);
+            this.swimmingRightArmAdjustment.set(data.swimmingRightArmAdjustment);
+            this.swimmingLeftArmAdjustment.set(data.swimmingLeftArmAdjustment);
+            this.swimmingElbowAdjustment.set(data.swimmingElbowAdjustment);
+            this.swimmingRightItemAdjustment.set(data.swimmingRightItemAdjustment);
+            this.swimmingLeftItemAdjustment.set(data.swimmingLeftItemAdjustment);
         }
     }
 
@@ -775,9 +879,7 @@ extends ModelBiped {
         part.updateBends(scale);
         GL11.glTranslatef(part.offsetX, part.offsetY, part.offsetZ);
         GL11.glTranslatef(part.rotationPointX * scale, part.rotationPointY * scale, part.rotationPointZ * scale);
-        GL11.glRotatef(-part.pre_rotation.getY(), 0.0f, 1.0f, 0.0f);
-        GL11.glRotatef(part.pre_rotation.getX(), 1.0f, 0.0f, 0.0f);
-        GL11.glRotatef(part.pre_rotation.getZ(), 0.0f, 0.0f, 1.0f);
+        part.applyPreRotation();
         if (part.rotateAngleZ != 0.0f) GL11.glRotatef(part.rotateAngleZ * 57.295776f, 0.0f, 0.0f, 1.0f);
         if (part.rotateAngleY != 0.0f) GL11.glRotatef(part.rotateAngleY * 57.295776f, 0.0f, 1.0f, 0.0f);
         if (part.rotateAngleX != 0.0f) GL11.glRotatef(part.rotateAngleX * 57.295776f, 1.0f, 0.0f, 0.0f);

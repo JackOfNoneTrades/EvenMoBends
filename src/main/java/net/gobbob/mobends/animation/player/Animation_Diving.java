@@ -14,6 +14,7 @@ import net.gobbob.mobends.data.EntityData;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
+import org.lwjgl.util.vector.Vector3f;
 
 /** A directional, streamlined pose used while travelling fully underwater. */
 public class Animation_Diving extends Animation {
@@ -26,15 +27,18 @@ public class Animation_Diving extends Animation {
     public void animate(EntityLivingBase entity, ModelBase baseModel, EntityData entityData) {
         ModelBendsPlayer model = (ModelBendsPlayer)baseModel;
         Data_Player data = (Data_Player)entityData;
+        apply(model, data.ticks, data.motion);
+    }
 
-        double horizontalSpeed = Math.sqrt(data.motion.x * data.motion.x + data.motion.z * data.motion.z);
-        double totalSpeed = Math.sqrt(horizontalSpeed * horizontalSpeed + data.motion.y * data.motion.y);
+    public static void apply(ModelBendsPlayer model, float ticks, Vector3f motion) {
+        double horizontalSpeed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        double totalSpeed = Math.sqrt(horizontalSpeed * horizontalSpeed + motion.y * motion.y);
         float moving = MathHelper.clamp_float((float)(totalSpeed / 0.18), 0.0f, 1.0f);
-        float phase = data.ticks * 0.24f;
+        float phase = ticks * 0.24f;
         float armStroke = (MathHelper.cos(phase) + 1.0f) / 2.0f;
         float legKick = MathHelper.cos(phase * 1.8f) * moving;
 
-        float travelPitch = (float)Math.toDegrees(Math.atan2(-data.motion.y, Math.max(horizontalSpeed, 0.02)));
+        float travelPitch = (float)Math.toDegrees(Math.atan2(-motion.y, Math.max(horizontalSpeed, 0.02)));
         travelPitch = MathHelper.clamp_float(travelPitch, -35.0f, 35.0f);
         float bodyTilt = 80.0f + travelPitch;
         model.renderRotation.setSmoothX(bodyTilt, 0.25f);
@@ -66,6 +70,7 @@ public class Animation_Diving extends Animation {
         ((ModelRendererBends)model.bipedLeftArm).rotation.setSmoothZ(0.0f, 0.3f);
         ((ModelRendererBends)model.bipedRightForeArm).rotation.setSmoothX(elbowBend, 0.3f);
         ((ModelRendererBends)model.bipedLeftForeArm).rotation.setSmoothX(elbowBend, 0.3f);
+        Animation_Swimming.applyHeldItemPose(model, MathHelper.clamp_float((float)(horizontalSpeed - 0.01) / 0.04f, 0, 1), 0.0f);
 
         ((ModelRendererBends)model.bipedRightLeg).rotation.setSmoothX(legKick * 35.0f, 0.3f);
         ((ModelRendererBends)model.bipedLeftLeg).rotation.setSmoothX(-legKick * 35.0f, 0.3f);

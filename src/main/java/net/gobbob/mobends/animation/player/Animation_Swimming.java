@@ -25,6 +25,7 @@ extends Animation {
     }
 
     public static void apply(ModelBendsPlayer model, float ticks, boolean moving) {
+        applyHeldItemPose(model, moving ? 1.0f : 0.0f, 0.0f);
         float armSway = (MathHelper.cos(ticks * 0.1625f) + 1.0f) / 2.0f;
         float armSway2 = (-MathHelper.sin(ticks * 0.1625f) + 1.0f) / 2.0f;
         float legFlap = MathHelper.cos(ticks * 0.4625f);
@@ -69,7 +70,14 @@ extends Animation {
             ((ModelRendererBends)model.bipedBody).rotation.setSmoothX(armSway * -20.0f);
             ((ModelRendererBends)model.bipedHead).rotation.setSmoothX(model.headRotationX);
             ((ModelRendererBends)model.bipedHead).rotation.setSmoothY(model.headRotationY);
-            model.renderItemRotation.setSmoothX(armSway * 120.0f, 0.3f);
         }
+    }
+
+    static void applyHeldItemPose(ModelBendsPlayer model, float weight, float externalPitch) {
+        // Item attachment only: both arms retain the entire original stroke.
+        model.swimmingItemPose.setSmoothX(weight, 0.3f);
+        model.swimmingItemPose.setSmoothY(weight, 0.3f);
+        model.swimmingItemPose.setZ(externalPitch);
+        model.renderItemRotation.setSmoothZero(0.3f);
     }
 }
