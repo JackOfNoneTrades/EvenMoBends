@@ -78,7 +78,10 @@ extends ModelRenderer {
             this.compileDisplayList(p_78785_1_);
         }
         GL11.glTranslatef((float)this.offsetX, (float)this.offsetY, (float)this.offsetZ);
-        if (this.rotateAngleX == 0.0f && this.rotateAngleY == 0.0f && this.rotateAngleZ == 0.0f) {
+        // The unpushed branches below never undo pre_rotation, so a pre-rotated part (e.g. the swimming
+        // head looking exactly level) would leak its tilt into the siblings rendered after it (the arms).
+        boolean preRotated = this.pre_rotation.getX() != 0.0f || this.pre_rotation.getY() != 0.0f || this.pre_rotation.getZ() != 0.0f;
+        if (this.rotateAngleX == 0.0f && this.rotateAngleY == 0.0f && this.rotateAngleZ == 0.0f && !preRotated) {
             if (this.rotationPointX == 0.0f && this.rotationPointY == 0.0f && this.rotationPointZ == 0.0f) {
                 GL11.glRotatef((float)(-this.pre_rotation.getY()), (float)0.0f, (float)1.0f, (float)0.0f);
                 GL11.glRotatef((float)this.pre_rotation.getX(), (float)1.0f, (float)0.0f, (float)0.0f);
