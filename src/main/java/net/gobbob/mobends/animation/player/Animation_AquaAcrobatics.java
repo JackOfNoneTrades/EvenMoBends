@@ -35,7 +35,6 @@ public final class Animation_AquaAcrobatics {
             pose(model.bipedLeftArm, reach, 0, -spread, weight);
             pose(model.bipedRightForeArm, elbow, 0, 0, weight);
             pose(model.bipedLeftForeArm, elbow, 0, 0, weight);
-            Animation_Swimming.applyHeldItemPose(model, weight * moving, (90.0f + model.headRotationX) * weight);
             pose(model.bipedRightLeg, kick * 18, 0, 3, weight);
             pose(model.bipedLeftLeg, -kick * 18, 0, -3, weight);
             pose(model.bipedRightForeLeg, 8 + Math.max(0, -kick) * 18, 0, 0, weight);

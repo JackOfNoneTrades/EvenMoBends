@@ -8,8 +8,6 @@ import net.gobbob.mobends.client.renderer.SwordTrail;
 import net.gobbob.mobends.data.EntityData;
 import net.gobbob.mobends.util.SmoothVector3f;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.util.vector.Vector4f;
-import org.lwjgl.util.vector.Vector3f;
 
 public class Data_Player
 extends EntityData {
@@ -30,12 +28,6 @@ extends EntityData {
     public SmoothVector3f renderOffset = new SmoothVector3f();
     public SmoothVector3f renderRotation = new SmoothVector3f();
     public SmoothVector3f renderItemRotation = new SmoothVector3f();
-    public SmoothVector3f swimmingItemPose = new SmoothVector3f();
-    public final Vector4f swimmingRightArmAdjustment = new Vector4f();
-    public final Vector4f swimmingLeftArmAdjustment = new Vector4f();
-    public final Vector3f swimmingElbowAdjustment = new Vector3f();
-    public final Vector4f swimmingRightItemAdjustment = new Vector4f();
-    public final Vector4f swimmingLeftItemAdjustment = new Vector4f();
     public SwordTrail swordTrail = new SwordTrail();
     public boolean sprintJumpLeg = false;
     public boolean fistPunchArm = false;
@@ -93,12 +85,6 @@ extends EntityData {
         this.renderOffset.set(argModel.renderOffset);
         this.renderRotation.set(argModel.renderRotation);
         this.renderItemRotation.set(argModel.renderItemRotation);
-        this.swimmingItemPose.set(argModel.swimmingItemPose);
-        this.swimmingRightArmAdjustment.set(argModel.swimmingRightArmAdjustment);
-        this.swimmingLeftArmAdjustment.set(argModel.swimmingLeftArmAdjustment);
-        this.swimmingElbowAdjustment.set(argModel.swimmingElbowAdjustment);
-        this.swimmingRightItemAdjustment.set(argModel.swimmingRightItemAdjustment);
-        this.swimmingLeftItemAdjustment.set(argModel.swimmingLeftItemAdjustment);
         this.swordTrail = argModel.swordTrail;
     }
 
@@ -156,3 +142,4 @@ extends EntityData {
         }
     }
 }
+

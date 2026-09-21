@@ -78,12 +78,11 @@ extends ModelRenderer {
             this.compileDisplayList(p_78785_1_);
         }
         GL11.glTranslatef((float)this.offsetX, (float)this.offsetY, (float)this.offsetZ);
-        // Pre-rotated parts need the matrix push/pop too, or their children/siblings
-        // no longer line up with postRender's held-item attachment.
-        if (this.rotateAngleX == 0.0f && this.rotateAngleY == 0.0f && this.rotateAngleZ == 0.0f
-            && !this.hasPreRotation()) {
+        if (this.rotateAngleX == 0.0f && this.rotateAngleY == 0.0f && this.rotateAngleZ == 0.0f) {
             if (this.rotationPointX == 0.0f && this.rotationPointY == 0.0f && this.rotationPointZ == 0.0f) {
-                this.applyPreRotation();
+                GL11.glRotatef((float)(-this.pre_rotation.getY()), (float)0.0f, (float)1.0f, (float)0.0f);
+                GL11.glRotatef((float)this.pre_rotation.getX(), (float)1.0f, (float)0.0f, (float)0.0f);
+                GL11.glRotatef((float)this.pre_rotation.getZ(), (float)0.0f, (float)0.0f, (float)1.0f);
                 GL11.glScalef((float)this.scaleX, (float)this.scaleY, (float)this.scaleZ);
                 if (!this.isHidden & this.showModel) {
                     GL11.glCallList((int)this.displayList);
@@ -95,7 +94,9 @@ extends ModelRenderer {
                 }
             } else {
                 GL11.glTranslatef((float)(this.rotationPointX * p_78785_1_), (float)(this.rotationPointY * p_78785_1_), (float)(this.rotationPointZ * p_78785_1_));
-                this.applyPreRotation();
+                GL11.glRotatef((float)(-this.pre_rotation.getY()), (float)0.0f, (float)1.0f, (float)0.0f);
+                GL11.glRotatef((float)this.pre_rotation.getX(), (float)1.0f, (float)0.0f, (float)0.0f);
+                GL11.glRotatef((float)this.pre_rotation.getZ(), (float)0.0f, (float)0.0f, (float)1.0f);
                 GL11.glScalef((float)this.scaleX, (float)this.scaleY, (float)this.scaleZ);
                 if (!this.isHidden & this.showModel) {
                     GL11.glCallList((int)this.displayList);
@@ -110,7 +111,9 @@ extends ModelRenderer {
         } else {
             GL11.glPushMatrix();
             GL11.glTranslatef((float)(this.rotationPointX * p_78785_1_), (float)(this.rotationPointY * p_78785_1_), (float)(this.rotationPointZ * p_78785_1_));
-            this.applyPreRotation();
+            GL11.glRotatef((float)(-this.pre_rotation.getY()), (float)0.0f, (float)1.0f, (float)0.0f);
+            GL11.glRotatef((float)this.pre_rotation.getX(), (float)1.0f, (float)0.0f, (float)0.0f);
+            GL11.glRotatef((float)this.pre_rotation.getZ(), (float)0.0f, (float)0.0f, (float)1.0f);
             if (this.rotateAngleZ != 0.0f) {
                 GL11.glRotatef((float)(this.rotateAngleZ * 57.295776f), (float)0.0f, (float)0.0f, (float)1.0f);
             }
@@ -134,16 +137,6 @@ extends ModelRenderer {
         GL11.glTranslatef((float)(-this.offsetX), (float)(-this.offsetY), (float)(-this.offsetZ));
     }
 
-    protected boolean hasPreRotation() {
-        return this.pre_rotation.vSmooth.lengthSquared() != 0;
-    }
-
-    public void applyPreRotation() {
-        GL11.glRotatef(-this.pre_rotation.getY(), 0, 1, 0);
-        GL11.glRotatef(this.pre_rotation.getX(), 1, 0, 0);
-        GL11.glRotatef(this.pre_rotation.getZ(), 0, 0, 1);
-    }
-
     public void update(float p_78785_1_) {
         this.rotation.update(p_78785_1_);
         this.pre_rotation.update(p_78785_1_);
@@ -163,12 +156,16 @@ extends ModelRenderer {
             if (this.rotateAngleX == 0.0f && this.rotateAngleY == 0.0f && this.rotateAngleZ == 0.0f) {
                 if (this.rotationPointX != 0.0f || this.rotationPointY != 0.0f || this.rotationPointZ != 0.0f) {
                     GL11.glTranslatef((float)(this.rotationPointX * p_78794_1_), (float)(this.rotationPointY * p_78794_1_), (float)(this.rotationPointZ * p_78794_1_));
-                    this.applyPreRotation();
+                    GL11.glRotatef((float)(-this.pre_rotation.getY()), (float)0.0f, (float)1.0f, (float)0.0f);
+                    GL11.glRotatef((float)this.pre_rotation.getX(), (float)1.0f, (float)0.0f, (float)0.0f);
+                    GL11.glRotatef((float)this.pre_rotation.getZ(), (float)0.0f, (float)0.0f, (float)1.0f);
                     GL11.glScalef((float)this.scaleX, (float)this.scaleY, (float)this.scaleZ);
                 }
             } else {
                 GL11.glTranslatef((float)(this.rotationPointX * p_78794_1_), (float)(this.rotationPointY * p_78794_1_), (float)(this.rotationPointZ * p_78794_1_));
-                this.applyPreRotation();
+                GL11.glRotatef((float)(-this.pre_rotation.getY()), (float)0.0f, (float)1.0f, (float)0.0f);
+                GL11.glRotatef((float)this.pre_rotation.getX(), (float)1.0f, (float)0.0f, (float)0.0f);
+                GL11.glRotatef((float)this.pre_rotation.getZ(), (float)0.0f, (float)0.0f, (float)1.0f);
                 if (this.rotateAngleZ != 0.0f) {
                     GL11.glRotatef((float)(this.rotateAngleZ * 57.295776f), (float)0.0f, (float)0.0f, (float)1.0f);
                 }
@@ -262,3 +259,4 @@ extends ModelRenderer {
         return this;
     }
 }
+
