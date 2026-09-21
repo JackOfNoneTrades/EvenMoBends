@@ -46,6 +46,7 @@ mobends.blink.tool.pupils=瞳孔
 mobends.blink.tool.regions=眼睛区域
 mobends.entity.player=玩家
 mobends.entity.spider=蜘蛛
+mobends.entity.cave_spider=洞穴蜘蛛
 mobends.entity.zombie=僵尸
 mobends.gui.back=返回
 mobends.gui.no=否

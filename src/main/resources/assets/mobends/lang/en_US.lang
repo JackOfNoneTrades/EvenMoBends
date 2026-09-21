@@ -46,6 +46,7 @@ mobends.blink.tool.pupils=Pupils
 mobends.blink.tool.regions=Eye regions
 mobends.entity.player=Player
 mobends.entity.spider=Spider
+mobends.entity.cave_spider=Cave Spider
 mobends.entity.zombie=Zombie
 mobends.gui.back=Back
 mobends.gui.no=No

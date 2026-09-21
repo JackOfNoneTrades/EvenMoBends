@@ -20,6 +20,7 @@ import net.gobbob.mobends.animation.player.Animation_Sprint;
 import net.gobbob.mobends.animation.player.Animation_Swimming;
 import net.gobbob.mobends.animation.zombie.Animation_Stand;
 import net.gobbob.mobends.animation.zombie.Animation_Walk;
+import net.gobbob.mobends.client.renderer.entity.RenderBendsCaveSpider;
 import net.gobbob.mobends.client.renderer.entity.RenderBendsPlayer;
 import net.gobbob.mobends.client.renderer.entity.RenderBendsSpider;
 import net.gobbob.mobends.client.renderer.entity.RenderBendsZombie;
@@ -28,6 +29,7 @@ import net.gobbob.mobends.util.BendsLogger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityCaveSpider;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
@@ -90,6 +92,10 @@ public class AnimatedEntity {
                 "zombie", "Zombie", new EntityZombie(null), EntityZombie.class, new RenderBendsZombie())
                     .add(new Animation_Stand())
                     .add(new Animation_Walk()));
+        // Subclasses must precede their parent for getByEntity's first-match lookup.
+        entities.add(
+            new AnimatedEntity(
+                "cave_spider", "Cave Spider", new EntityCaveSpider(null), EntityCaveSpider.class, new RenderBendsCaveSpider()));
         entities.add(
             new AnimatedEntity(
                 "spider", "Spider", new EntitySpider(null), EntitySpider.class, new RenderBendsSpider()));
